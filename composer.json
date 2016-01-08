@@ -1,6 +1,6 @@
 {
   "name": "trinity/search",
-  "description": "Trinity Grid bundle",
+  "description": "Trinity Search bundle",
   "type": "symfony-bundle",
   "license": "MIT",
   "authors": [
