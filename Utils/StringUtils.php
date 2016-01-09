@@ -28,6 +28,7 @@ final class StringUtils
 
     /**
      * @param string $str
+     *
      * @return int
      */
     public static function length($str) : int
