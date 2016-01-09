@@ -17,6 +17,7 @@ final class StringUtils
 
     /**
      * @param string $str
+     *
      * @return bool
      */
     public static function isEmpty($str) : bool
