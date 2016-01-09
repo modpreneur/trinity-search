@@ -15,6 +15,10 @@ final class StringUtils
     const EMPTY_STR = '';
 
 
+    /**
+     * @param string $str
+     * @return bool
+     */
     public static function isEmpty($str) : bool
     {
         return (self::EMPTY_STR === $str) || (null === $str);
