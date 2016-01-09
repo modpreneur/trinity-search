@@ -1,8 +1,15 @@
 <?php
+/**
+ * This file is part of Trinity package.
+ */
 
-namespace Trinity\SearchBundle\NQL;
+namespace Trinity\Bundle\SearchBundle\NQL;
 
 
+/**
+ * Class WherePart
+ * @package Trinity\Bundle\SearchBundle\NQL
+ */
 class WherePart
 {
     public $type;

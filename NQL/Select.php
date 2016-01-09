@@ -1,24 +1,27 @@
 <?php
+/**
+ * This file is part of Trinity package.
+ */
 
-namespace Trinity\SearchBundle\NQL;
+namespace Trinity\Bundle\SearchBundle\NQL;
 
 
-use Trinity\SearchBundle\Exception\SyntaxErrorException;
+use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
 
+
+/**
+ * Class Select
+ * @package Trinity\Bundle\SearchBundle\NQL
+ */
 class Select
 {
     private $columns = array();
+
 
     private function __construct()
     {
     }
 
-    /**
-     * @return Column[]
-     */
-    public function getColumns() {
-        return $this->columns;
-    }
 
     /**
      * Parse SELECT string
@@ -26,12 +29,13 @@ class Select
      * @return Select
      * @throws SyntaxErrorException
      */
-    public static function parse($str = "") {
+    public static function parse($str = "")
+    {
         $selection = new Select();
 
         $columns = preg_split("/,/", $str);
 
-        foreach($columns as &$column) {
+        foreach ($columns as &$column) {
             $column = Column::parse($column);
         }
 
@@ -40,7 +44,21 @@ class Select
         return $selection;
     }
 
-    public static function getBlank() {
+
+    /**
+     * @return Select
+     */
+    public static function getBlank()
+    {
         return new Select();
+    }
+
+
+    /**
+     * @return Column[]
+     */
+    public function getColumns()
+    {
+        return $this->columns;
     }
 }

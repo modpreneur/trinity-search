@@ -1,8 +1,14 @@
 <?php
+/**
+ * This file is part of Trinity package.
+ */
 
-namespace Trinity\SearchBundle\NQL;
+namespace Trinity\Bundle\SearchBundle\NQL;
 
-
+/**
+ * Class Operator
+ * @package Trinity\Bundle\SearchBundle\NQL
+ */
 class Operator
 {
     const AND = 'AND';
@@ -16,23 +22,30 @@ class Operator
 
     private $value;
 
+
+    /**
+     * Operator constructor.
+     * @param null $operator
+     */
     public function __construct($operator = null)
     {
-        if($operator == null)
+        if ($operator == null) {
             $this->value = self::EQ;
-        else
+        } else {
             $this->value = $operator;
+        }
     }
+
 
     /**
      * @param string|Operator $operator
      * @return bool
      */
-    public function compareTo($operator) {
-        if($operator instanceof Operator) {
+    public function compareTo($operator)
+    {
+        if ($operator instanceof Operator) {
             return $operator->value === $this->value;
-        }
-        else {
+        } else {
             return $operator === $this->value;
         }
     }

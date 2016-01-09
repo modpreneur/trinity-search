@@ -1,23 +1,33 @@
 <?php
+/**
+ * This file is part of Trinity package.
+ */
 
-namespace Trinity\SearchBundle\Utils;
+namespace Trinity\Bundle\SearchBundle\Utils;
 
 
+/**
+ * Class StringUtils
+ * @package Trinity\Bundle\SearchBundle\Utils
+ */
 final class StringUtils
 {
     const EMPTY_STR = '';
 
-    public static function isEmpty($str)
+
+    public static function isEmpty($str) : bool
     {
         return (self::EMPTY_STR === $str) || (null === $str);
     }
 
-    public static function length($str)
+
+    public static function length($str) : int
     {
         return \strlen($str);
     }
 
-    public static function substring($str, $start, $end = null)
+
+    public static function substring($str, $start, $end = null) : string
     {
         if ((0 > $start) && (0 < $end)) {
             $start = 0;
@@ -25,28 +35,33 @@ final class StringUtils
         if (null === $end) {
             $end = self::length($str);
         }
+
         return \substr($str, $start, $end - $start);
     }
 
-    public static function startsWith($str, $prefix)
+
+    public static function startsWith($str, $prefix) : bool
     {
-        return ((null === $str) && (null === $prefix))
-            ? true
-            : self::substring($str, 0, self::length($prefix)) === $prefix;
+        return ((null === $str) && (null === $prefix)) ? true : self::substring(
+                $str,
+                0,
+                self::length($prefix)
+            ) === $prefix;
     }
+
 
     public static function removeStart($str, $remove)
     {
-        if ((true === self::isEmpty($str))
-            || (true === self::isEmpty($remove))
-        ) {
+        if ((true === self::isEmpty($str)) || (true === self::isEmpty($remove))) {
             return $str;
         }
         if (true === self::startsWith($str, $remove)) {
             return self::substring($str, self::length($remove));
         }
+
         return $str;
     }
+
 
     public static function indexOf($str, $search, $startPos = 0)
     {
@@ -58,10 +73,10 @@ final class StringUtils
             return $startPos;
         }
         $pos = \strpos($str, $search, $startPos);
-        return (false === $pos)
-            ? -1
-            : $pos;
+
+        return (false === $pos) ? -1 : $pos;
     }
+
 
     private static function validateIndexOf($str, $search, &$startPos)
     {
@@ -79,16 +94,19 @@ final class StringUtils
         if (0 > $startPos) {
             $startPos = 0;
         }
+
         return true;
     }
+
 
     /**
      * Trim array of strings
      * @param $array
      * @return array
      */
-    public static function trimStringArray($array) {
-        foreach($array as &$item) {
+    public static function trimStringArray($array)
+    {
+        foreach ($array as &$item) {
             $item = trim($item);
         }
 

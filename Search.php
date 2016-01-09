@@ -1,12 +1,19 @@
 <?php
+/**
+ * This file is part of Trinity package.
+ */
 
-namespace Trinity\SearchBundle;
-
+namespace Trinity\Bundle\SearchBundle;
 
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Trinity\SearchBundle\NQL\DQLConverter;
-use Trinity\SearchBundle\NQL\NQLQuery;
+use Trinity\Bundle\SearchBundle\NQL\DQLConverter;
+use Trinity\Bundle\SearchBundle\NQL\NQLQuery;
 
+
+/**
+ * Class Search
+ * @package Trinity\Bundle\SearchBundle
+ */
 final class Search
 {
     private $dqlConverter;

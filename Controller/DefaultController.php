@@ -1,6 +1,9 @@
 <?php
+/**
+ * This file is part of Trinity package.
+ */
 
-namespace Trinity\SearchBundle\Controller;
+namespace Trinity\Bundle\SearchBundle\Controller;
 
 use Doctrine\ORM\Query;
 use FOS\RestBundle\Controller\Annotations\Get;

@@ -1,14 +1,28 @@
 <?php
+/**
+ * This file is part of Trinity package.
+ */
 
-namespace Trinity\SearchBundle\NQL;
+namespace Trinity\Bundle\SearchBundle\NQL;
 
 
+/**
+ * Class Table
+ * @package Trinity\Bundle\SearchBundle\NQL
+ */
 class Table
 {
     private $name;
     private $prefix;
     private $alias;
 
+
+    /**
+     * Table constructor.
+     * @param $prefix
+     * @param $name
+     * @param null $alias
+     */
     function __construct($prefix, $name, $alias = null)
     {
         $this->prefix = $prefix;
@@ -16,6 +30,13 @@ class Table
 
         $this->alias = is_null($alias) ? $this->getDefaultAlias() : $alias;
     }
+
+
+    private function getDefaultAlias()
+    {
+        return strtolower($this->name);
+    }
+
 
     /**
      * @return string
@@ -25,6 +46,7 @@ class Table
         return $this->name;
     }
 
+
     /**
      * @return string
      */
@@ -33,16 +55,13 @@ class Table
         return $this->prefix;
     }
 
+
     /**
      * @return string|null
      */
     public function getAlias()
     {
         return $this->alias;
-    }
-
-    private function getDefaultAlias() {
-        return strtolower($this->name);
     }
 
 }
