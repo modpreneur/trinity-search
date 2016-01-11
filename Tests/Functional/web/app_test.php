@@ -2,7 +2,7 @@
 require_once __DIR__.'/../app/AppKernel.php';
 
 use Symfony\Component\HttpFoundation\Request;
-use Trinity\Bundle\GridBundle\Tests\Functional\app\AppKernel;
+use Trinity\Bundle\SearchBundle\Tests\Functional\app\AppKernel;
 
 
 $kernel = new AppKernel('dev', true);

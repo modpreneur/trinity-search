@@ -16,7 +16,8 @@
     "nette/utils": "~2.3",
     "trinity/framework": "dev-master",
     "dmishh/settings-bundle" : "dev-master",
-    "friendsofsymfony/rest-bundle": "~1.7"
+    "friendsofsymfony/rest-bundle": "~1.7",
+    "fzaninotto/faker": "^1.5"
   },
 
   "require-dev": {

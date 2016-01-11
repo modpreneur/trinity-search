@@ -6,6 +6,7 @@ namespace Trinity\Bundle\SearchBundle\Tests\Functional\app;
 $dir = __DIR__;
 $lastDir = null;
 
+
 while ($dir !== $lastDir) {
     $lastDir = $dir;
     if (file_exists($dir.'/autoload.php')) {
@@ -47,6 +48,7 @@ class AppKernel extends Kernel
             new \Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle(),
             new \Symfony\Bundle\SecurityBundle\SecurityBundle(),
             new \Symfony\Bundle\TwigBundle\TwigBundle(),
+            new \Sensio\Bundle\GeneratorBundle\SensioGeneratorBundle(),
 
 
             new \Trinity\FrameworkBundle\TrinityFrameworkBundle(),

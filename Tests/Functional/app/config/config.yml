@@ -10,12 +10,12 @@ parameters:
     mailer_port: 25
     mailer_user: null
     mailer_password: null
-    locale: en
     secret: ThisTokenIsNotSoSecretChangeIt
     debug_toolbar: true
     debug_redirects: false
     use_assetic_controller: true
     locale: en
+    trinity.search.bundle: "SearchBundle"
 
 # Doctrine Configuration
 doctrine:
@@ -25,7 +25,15 @@ doctrine:
       host:     "%database_host%"
     orm:
         auto_generate_proxy_classes: "%kernel.debug%"
-        auto_mapping: true
+        auto_mapping: false
+        mappings:
+          SearchBundle:
+            type: annotation
+            dir: '%kernel.root_dir%/../Entity'
+            is_bundle: false
+            prefix: Search/Entity
+            alias: Search
+
 
 framework:
     secret: "Three can keep a secret, if two of them are dead. MUHEHE."
