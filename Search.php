@@ -23,6 +23,12 @@ final class Search
         $this->dqlConverter = $dqlConverter;
     }
 
+    /**
+     * @param $tableName
+     * @param $queryParams
+     * @return NQLQuery
+     * @throws NotFoundHttpException
+     */
     public function queryTable($tableName, $queryParams)
     {
         $query = "SELECT e.".$tableName." ".$queryParams;
@@ -34,12 +40,17 @@ final class Search
         return $this->query($query);
     }
 
+    /**
+     * @param $queryParams
+     * @return array
+     * @throws NotFoundHttpException
+     */
     public function queryGlobal($queryParams) {
         $results = array();
 
         foreach ($this->dqlConverter->getAvailableEntities() as $entity) {
             try {
-                $result = $this->queryTable($entity, $queryParams);
+                $result = $this->queryTable($entity, $queryParams)->getQueryBuilder()->getQuery()->getResult();
 
                 if (count($result)) {
                     $results[$entity] = $result;
@@ -51,10 +62,16 @@ final class Search
         return $results;
     }
 
-    public function query($nqlQuery) {
-        $nqlQuery = NQLQuery::parse(trim($nqlQuery));
+    /**
+     * @param $query
+     * @return NQLQuery
+     * @throws Exception\SyntaxErrorException
+     */
+    public function query($query) {
+        $nqlQuery = NQLQuery::parse(trim($query));
+        $nqlQuery->setDqlConverter($this->dqlConverter);
 
-        return $this->dqlConverter->convert($nqlQuery)->getQuery()->getResult();
+        return $nqlQuery;
     }
 
     public static function createNotFoundException($message = 'Not Found', \Exception $previous = null)
