@@ -120,9 +120,9 @@ class NQLQuery
     /**
      * @return \Doctrine\ORM\QueryBuilder|null
      */
-    public function getQueryBuilder() {
+    public function getQueryBuilder($skipSelection = false) {
         if(!is_null($this->dqlConverter)) {
-            return $this->dqlConverter->convert($this);
+            return $this->dqlConverter->convert($this, $skipSelection);
         } else {
             return null;
         }
