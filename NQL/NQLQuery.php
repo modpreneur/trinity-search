@@ -23,6 +23,11 @@ class NQLQuery
     private $limit;
     private $offset;
 
+    /**
+     * @var DQLConverter
+     */
+    private $dqlConverter;
+
 
     private function __construct()
     {
@@ -109,5 +114,21 @@ class NQLQuery
     public function getOffset()
     {
         return $this->offset;
+    }
+
+
+    /**
+     * @return \Doctrine\ORM\QueryBuilder|null
+     */
+    public function getQueryBuilder($skipSelection = false) {
+        if(!is_null($this->dqlConverter)) {
+            return $this->dqlConverter->convert($this, $skipSelection);
+        } else {
+            return null;
+        }
+    }
+
+    function setDqlConverter(DQLConverter $converter) {
+        $this->dqlConverter = $converter;
     }
 }

@@ -42,7 +42,7 @@ class DefaultController extends FOSRestController
             return $search->queryGlobal($queryParams);
         }
         else {
-            return $search->queryTable($tableName, $queryParams);
+            return $search->queryTable($tableName, $queryParams)->getQueryBuilder()->getQuery()->getResult();
         }
     }
 }

@@ -46,7 +46,7 @@ class DQLConverter
      * @return QueryBuilder
      * @throws SyntaxErrorException
      */
-    public function convert(NQLQuery $nqlQuery)
+    public function convert(NQLQuery $nqlQuery, $skipSelection)
     {
 
         $this->checkTables($nqlQuery->getFrom());
@@ -56,12 +56,17 @@ class DQLConverter
         $columnDefaultAlias = count($nqlQuery->getFrom()->getTables()) === 1 ? $nqlQuery->getFrom()->getTables(
         )[0]->getAlias() : "";
 
-        if ($nqlQuery->getSelect()->getColumns()) {
-            foreach ($nqlQuery->getSelect()->getColumns() as $column) {
-                $query->addSelect((($column->getAlias()) ?? $columnDefaultAlias).'.'.$column->getName());
-            }
-        } else {
+        if($skipSelection) {
             $query->select($columnDefaultAlias);
+        }
+        else {
+            if ($nqlQuery->getSelect()->getColumns()) {
+                foreach ($nqlQuery->getSelect()->getColumns() as $column) {
+                    $query->addSelect((($column->getAlias()) ?? $columnDefaultAlias) . '.' . $column->getName());
+                }
+            } else {
+                $query->select($columnDefaultAlias);
+            }
         }
 
         foreach ($nqlQuery->getFrom()->getTables() as $table) {
