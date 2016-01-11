@@ -56,7 +56,10 @@ class DQLConverter
         $columnDefaultAlias = count($nqlQuery->getFrom()->getTables()) === 1 ? $nqlQuery->getFrom()->getTables(
         )[0]->getAlias() : "";
 
-        if(!$skipSelection) {
+        if($skipSelection) {
+            $query->select($columnDefaultAlias);
+        }
+        else {
             if ($nqlQuery->getSelect()->getColumns()) {
                 foreach ($nqlQuery->getSelect()->getColumns() as $column) {
                     $query->addSelect((($column->getAlias()) ?? $columnDefaultAlias) . '.' . $column->getName());
