@@ -17,7 +17,8 @@
     "trinity/framework": "dev-master",
     "dmishh/settings-bundle" : "dev-master",
     "friendsofsymfony/rest-bundle": "~1.7",
-    "fzaninotto/faker": "^1.5"
+    "fzaninotto/faker": "^1.5",
+    "sensio/framework-extra-bundle": "~3.0"
   },
 
   "require-dev": {

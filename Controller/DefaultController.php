@@ -11,7 +11,6 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\View;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcher;
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -27,7 +26,6 @@ class DefaultController extends FOSRestController
      * @QueryParam(name="q", nullable=false, strict=true, description="DB Query", allowBlank=true)
      *
      * @param ParamFetcher $paramFetcher
-     * @ApiDoc()
      *
      * @return JsonResponse
      *
@@ -42,7 +40,27 @@ class DefaultController extends FOSRestController
             return $search->queryGlobal($queryParams);
         }
         else {
-            return $search->queryTable($tableName, $queryParams)->getQueryBuilder()->getQuery()->getResult();
+            $nqlQuery = $search->queryTable($tableName, $queryParams);
+
+            $entities = $nqlQuery->getQueryBuilder(true)->getQuery()->getResult();
+
+            $result = [];
+
+            $select = $nqlQuery->getSelect();
+
+            foreach($entities as $entity) {
+                $result[] = $this->select($search, $select->getColumns(), $entity);
+            }
+
+            return $result;
         }
+    }
+
+    private function select($search, $columns, $entity) {
+        $attributes = [];
+        foreach($columns as $column) {
+            $attributes[$column->getName()] = $search->getValue($entity, $column->getFullName());
+        }
+        return $attributes;
     }
 }

@@ -82,6 +82,15 @@ class Column
         $this->joinWith = $joinWith;
     }
 
+    function getFullName()
+    {
+        $fullName = $this->getName();
+        if(!is_null($this->joinWith))
+            $fullName = $this->joinWith . "." . $fullName;
+        if(!is_null($this->alias))
+            $fullName = $this->alias . "." . $fullName;
+        return $fullName;
+    }
 
     /**
      * Alias = null - parsed alias is used, otherwise parsed alias is used as join field

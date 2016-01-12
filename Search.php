@@ -8,6 +8,7 @@ namespace Trinity\Bundle\SearchBundle;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Trinity\Bundle\SearchBundle\NQL\DQLConverter;
 use Trinity\Bundle\SearchBundle\NQL\NQLQuery;
+use Trinity\FrameworkBundle\Utils\ObjectMixin;
 
 
 /**
@@ -77,5 +78,27 @@ final class Search
     public static function createNotFoundException($message = 'Not Found', \Exception $previous = null)
     {
         return new NotFoundHttpException($message, $previous);
+    }
+
+    public static function getValue($entity, $value) {
+        $values = explode(".", $value);
+
+        return self::getObject($entity, $values, 0);
+    }
+
+    private static function getObject($entity, $values, $curValueIndex) {
+        try {
+            $obj = ObjectMixin::get($entity, $values[$curValueIndex]);
+
+            if ($curValueIndex == count($values) - 1) {
+                return $obj;
+            } else if (is_object($obj)) {
+                return self::getObject($obj, $values, $curValueIndex + 1);
+            } else {
+                return $obj;
+            }
+        } catch(\Exception $ex) {
+            return "";
+        }
     }
 }
