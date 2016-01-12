@@ -60,6 +60,17 @@ final class StringUtils
     }
 
 
+    public static function endsWith($str, $suffix)
+    {
+        return ((null === $str) && (null === $suffix))
+            ? true
+            : self::substring(
+                $str,
+                self::length($str) - self::length($suffix)
+            ) === $suffix;
+    }
+
+
     public static function removeStart($str, $remove)
     {
         if ((true === self::isEmpty($str)) || (true === self::isEmpty($remove))) {

@@ -48,7 +48,7 @@ class DefaultController extends FOSRestController
 
             if(!$skipSelection)
                 return $entities;
-            
+
             $result = [];
 
             $select = $nqlQuery->getSelect();

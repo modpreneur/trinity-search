@@ -31,12 +31,12 @@ class OrderBy
         $this->columns = $columns;
     }
 
-    public function setDefaultColumnAlias($alias) {
-        foreach($this->columns as $column) {
-            if(is_null($column->getAlias()))
-                $column->setAlias($alias);
-        }
-    }
+//    public function setDefaultColumnAlias($alias) {
+//        foreach($this->columns as $column) {
+//            if(is_null($column->getAlias()))
+//                $column->setAlias($alias);
+//        }
+//    }
 
     /**
      * @param $str

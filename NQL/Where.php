@@ -7,6 +7,7 @@ namespace Trinity\Bundle\SearchBundle\NQL;
 
 
 use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
+use Trinity\Bundle\SearchBundle\Utils\StringUtils;
 
 
 /**
@@ -120,7 +121,10 @@ class Where
                         $part = new WherePart();
                         $part->type = WherePartType::CONDITION;
                         $part->key = Column::parse($match['key']);
-                        $part->value = $match['value'];
+                        $value = $match['value'];
+                        if(StringUtils::startsWith($value,'"') && StringUtils::endsWith($value, '"'))
+                            $value = StringUtils::substring($value, 1, StringUtils::length($value) - 1);
+                        $part->value = $value;
                         $part->operator = $match['operator'];
 
                         $parts[] = $part;

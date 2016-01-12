@@ -82,12 +82,12 @@ class DQLConverter
 
         foreach ($columns as $column) {
             if (!is_null($column->getJoinWith())) {
-                $query->innerJoin($column->getAlias().'.'.$column->getJoinWith(), $column->getJoinWith());
+                $query->innerJoin((is_null($column->getAlias()) ? $columnDefaultAlias : $column->getAlias()).'.'.$column->getJoinWith(), $column->getJoinWith());
             }
         }
 
         foreach($nqlQuery->getOrderBy()->getColumns() as $column) {
-            $query->addOrderBy($column->getAlias() . "." . $column->getName(), $column->getOrdering());
+            $query->addOrderBy((is_null($column->getAlias()) ? $columnDefaultAlias : $column->getAlias()) . "." . $column->getName(), $column->getOrdering());
         }
 
         if (!is_null($nqlQuery->getLimit())) {

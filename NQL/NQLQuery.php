@@ -68,9 +68,6 @@ class NQLQuery
 
             if (array_key_exists('orderby', $match) && !empty($match['orderby'])) {
                 $query->orderBy = OrderBy::parse($match['orderby']);
-                if(count($query->from->getTables()) == 1) {
-                    $query->orderBy->setDefaultColumnAlias($query->from->getTables()[0]->getName());
-                }
             } else {
                 $query->orderBy = OrderBy::getBlank();
             }
