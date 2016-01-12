@@ -15,13 +15,14 @@ use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
  */
 class NQLQuery
 {
-    private static $regSearchQuery = '/^SELECT\s(?<from>[^({]+)(\s(\((?<select>.+)\))?\s*({(?<where>.+)})?)?(\sLIMIT\s(?<limit>\d+)(\sOFFSET\s(?<offset>\d+))?)?$/';
+    private static $regSearchQuery = '/^SELECT\s(?<from>[^({]+)(\s(\((?<select>.+)\))?\s*({(?<where>.+)})?)?(\sLIMIT\s*=\s*(?<limit>\d+)(\sOFFSET\s*=\s*(?<offset>\d+))?)?(\sORDER\sBY\s(?<orderby>.+))?$/';
 
     private $select;
     private $from;
     private $where;
     private $limit;
     private $offset;
+    private $orderBy;
 
     /**
      * @var DQLConverter
@@ -64,6 +65,15 @@ class NQLQuery
             }
 
             $query->from = From::parse($match['from']);
+
+            if (array_key_exists('orderby', $match) && !empty($match['orderby'])) {
+                $query->orderBy = OrderBy::parse($match['orderby']);
+                if(count($query->from->getTables()) == 1) {
+                    $query->orderBy->setDefaultColumnAlias($query->from->getTables()[0]->getName());
+                }
+            } else {
+                $query->orderBy = OrderBy::getBlank();
+            }
         } else {
             throw new SyntaxErrorException("Incorrect query");
         }
@@ -114,6 +124,14 @@ class NQLQuery
     public function getOffset()
     {
         return $this->offset;
+    }
+
+
+    /**
+     * @return OrderBy
+     */
+    public function getOrderBy() {
+        return $this->orderBy;
     }
 
 

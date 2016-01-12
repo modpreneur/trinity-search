@@ -86,6 +86,10 @@ class DQLConverter
             }
         }
 
+        foreach($nqlQuery->getOrderBy()->getColumns() as $column) {
+            $query->addOrderBy($column->getAlias() . "." . $column->getName(), $column->getOrdering());
+        }
+
         if (!is_null($nqlQuery->getLimit())) {
             $query->setMaxResults($nqlQuery->getLimit());
         }
