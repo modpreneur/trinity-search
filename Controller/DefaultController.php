@@ -59,7 +59,8 @@ class DefaultController extends FOSRestController
     private function select($search, $columns, $entity) {
         $attributes = [];
         foreach($columns as $column) {
-            $attributes[$column->getName()] = $search->getValue($entity, $column->getFullName());
+            $fullName = $column->getFullName();
+            $attributes[$fullName] = $search->getValue($entity, $fullName);
         }
         return $attributes;
     }
