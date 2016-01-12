@@ -42,8 +42,13 @@ class DefaultController extends FOSRestController
         else {
             $nqlQuery = $search->queryTable($tableName, $queryParams);
 
-            $entities = $nqlQuery->getQueryBuilder(true)->getQuery()->getResult();
+            $skipSelection = count($nqlQuery->getSelect()->getColumns());
 
+            $entities = $nqlQuery->getQueryBuilder($skipSelection)->getQuery()->getResult();
+
+            if(!$skipSelection)
+                return $entities;
+            
             $result = [];
 
             $select = $nqlQuery->getSelect();
