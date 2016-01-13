@@ -28,7 +28,7 @@ class Column
         $this->name = $name;
         $this->wrappingFunction = StringUtils::isEmpty($wrappingFunction) ? null : $wrappingFunction;
         $this->alias = StringUtils::isEmpty($alias) ? null : $alias;
-        $this->joinWith = StringUtils::isEmpty($joinWith) ? null : $joinWith;
+        $this->joinWith = StringUtils::isEmpty($joinWith) ? [] : $joinWith;
     }
 
 
@@ -57,7 +57,7 @@ class Column
 
 
     /**
-     * @return string|null
+     * @return string[]|null
      */
     public function getJoinWith()
     {
@@ -75,7 +75,7 @@ class Column
 
 
     /**
-     * @param string|null $joinWith
+     * @param string[]|null $joinWith
      */
     function setJoinWith($joinWith)
     {
@@ -85,8 +85,15 @@ class Column
     function getFullName()
     {
         $fullName = $this->getName();
-        if(!is_null($this->joinWith))
-            $fullName = $this->joinWith . "." . $fullName;
+        if(count($this->joinWith)) {
+            $count = count($this->joinWith);
+
+            if($count > 1) {
+                $fullName = implode('.', $this->joinWith) . "." . $fullName;
+            } else {
+                $fullName = $this->joinWith[0] . $fullName;
+            }
+        }
         if(!is_null($this->alias))
             $fullName = $this->alias . "." . $fullName;
         return $fullName;
@@ -109,7 +116,7 @@ class Column
             $name = $match['column'];
             $alias = is_null($alias) ? $match['alias'] : $alias;
             $function = $match['function'];
-            $joinWith = is_null($alias) ? $match['alias'] : $match['joinWith'];
+            $joinWith = is_null($alias) ? $match['alias'] : explode(":",$match['joinWith']);
 
             return new Column($name, $alias, $function, $joinWith);
         } else {

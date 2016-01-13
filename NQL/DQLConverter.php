@@ -81,8 +81,17 @@ class DQLConverter
         $columns = $this->getAllColumnsFromWhere($nqlQuery->getWhere()->getConditions());
 
         foreach ($columns as $column) {
-            if (!is_null($column->getJoinWith())) {
-                $query->innerJoin((is_null($column->getAlias()) ? $columnDefaultAlias : $column->getAlias()).'.'.$column->getJoinWith(), $column->getJoinWith());
+            if (count($column->getJoinWith())) {
+                $joinWith = $column->getJoinWith();
+                for($i=0;$i<count($joinWith);$i++) {
+                    if($i == 0) {
+                        $column = (is_null($column->getAlias()) ? $columnDefaultAlias : $column->getAlias()).'.'.$column->getJoinWith()[$i];
+                    }
+                    else {
+                        $column = $joinWith[$i-1].".".$joinWith[$i];
+                    }
+                    $query->innerJoin($column, $joinWith[$i]);
+                }
             }
         }
 
@@ -162,8 +171,8 @@ class DQLConverter
                     $whereClause .= " ".$cond->value;
                     break;
                 case WherePartType::CONDITION:
-                    $whereClause .= " ".(is_null($cond->key->getJoinWith()) ? ($cond->key->getAlias(
-                            ) ?? $columnDefaultAlias) : $cond->key->getJoinWith()).".".$cond->key->getName(
+                    $whereClause .= " ".(!count($cond->key->getJoinWith()) ? ($cond->key->getAlias(
+                            ) ?? $columnDefaultAlias) : $cond->key->getJoinWith()[count($cond->key->getJoinWith())-1]).".".$cond->key->getName(
                         ).$cond->operator."?".$paramCounter;
                     $whereParams[] = $cond->value;
                     $paramCounter++;
