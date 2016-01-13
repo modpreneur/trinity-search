@@ -74,7 +74,19 @@ class DefaultController extends FOSRestController
         $attributes = [];
         foreach($columns as $column) {
             $fullName = $column->getFullName();
-            $attributes[$fullName] = $search->getValue($entity, $fullName);
+            $value = $search->getValue($entity, $fullName);
+
+            if(is_array($value)) {
+                $key = count($column->getJoinWith()) ? $column->getJoinWith()[0] : $column->getName();
+            } else {
+                $key = $fullName;
+            }
+
+            if(array_key_exists($key, $attributes)) {
+                $attributes[$key] = array_replace_recursive($attributes[$key], $value);
+            } else {
+                $attributes[$key] = $value;
+            }
         }
         return $attributes;
     }

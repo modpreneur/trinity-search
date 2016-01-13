@@ -89,15 +89,20 @@ final class Search
     private static function getObject($entity, $values, $curValueIndex) {
         try {
             $obj = ObjectMixin::get($entity, $values[$curValueIndex]);
-
             if ($curValueIndex == count($values) - 1) {
                 return $obj;
+            } else if ($obj instanceof PersistentCollection) {
+                $items = [];
+                foreach ($obj as $item) {
+                    $items[] = array($values[$curValueIndex + 1] => self::getObject($item, $values, $curValueIndex + 1));
+                }
+                return $items;
             } else if (is_object($obj)) {
                 return self::getObject($obj, $values, $curValueIndex + 1);
             } else {
                 return $obj;
             }
-        } catch(\Exception $ex) {
+        } catch (\Exception $ex) {
             return "";
         }
     }
