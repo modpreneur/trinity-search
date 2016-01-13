@@ -15,9 +15,9 @@ Base route:
 ##Syntax
 Append query to the base route. Query can be composed of:
 
-* (optional) Column selection - put columns which you want to return into simple brackets.
+* (optional) Column selection - put columns which you want to return into simple brackets. If you want to access column from associated table, simply put colon and name of the column from associated table
 ```sh
-(column1,column2,column3,column4.someAttribute.anotherAttribute)
+(column1,column2,column3,column4:attributeFromAssociatedTable:anotherAttribute)
 ```
 * (optional) Conditions - put conditions into curly brackets. Available operators: <, >, =, <=, >=, !=, AND, OR
 ```sh
@@ -41,6 +41,6 @@ ORDER BY column1 ASC, column2 DESC
 #####Example
 ```sh
 /admin/search/product/?q=
-(id,name,defaultBillingPlan.initialPrice,clients)
-{clients:name = "HotAtHome"} LIMIT=10 OFFSET=0 ORDER BY name ASC
+(id,name,defaultBillingPlan:initialPrice)
+{defaultBillingPlan:initialPrice > "14"} LIMIT=10 OFFSET=0 ORDER BY clients:name ASC, defaultBillingPlan:initialPrice DESC
 ```
