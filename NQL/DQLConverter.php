@@ -48,7 +48,6 @@ class DQLConverter
      */
     public function convert(NQLQuery $nqlQuery, $skipSelection)
     {
-
         $this->checkTables($nqlQuery->getFrom());
 
         $query = $this->em->createQueryBuilder();
@@ -78,25 +77,32 @@ class DQLConverter
             $query->where($paramWhere['clause'])->setParameters($paramWhere['params']);
         }
 
-        $columns = $this->getAllColumnsFromWhere($nqlQuery->getWhere()->getConditions());
+        //$columns = $this->getAllColumnsFromWhere($nqlQuery->getWhere()->getConditions());
+        $columns = $this->getAllColumns($skipSelection ? Select::getBlank() : $nqlQuery->getSelect(), $nqlQuery->getWhere(), $nqlQuery->getOrderBy());
+
+        $alreadyJoined = [];
 
         foreach ($columns as $column) {
             if (count($column->getJoinWith())) {
                 $joinWith = $column->getJoinWith();
                 for($i=0;$i<count($joinWith);$i++) {
-                    if($i == 0) {
-                        $column = (is_null($column->getAlias()) ? $columnDefaultAlias : $column->getAlias()).'.'.$column->getJoinWith()[$i];
+                    if(!array_key_exists($joinWith[$i], $alreadyJoined)) {
+                        if ($i == 0) {
+                            $column = (is_null($column->getAlias()) ? $columnDefaultAlias : $column->getAlias()) . '.' . $column->getJoinWith()[$i];
+                        } else {
+                            $column = $joinWith[$i - 1] . "." . $joinWith[$i];
+                        }
+                        $query->innerJoin($column, $joinWith[$i]);
+
+                        $alreadyJoined[$joinWith[$i]] = null;
                     }
-                    else {
-                        $column = $joinWith[$i-1].".".$joinWith[$i];
-                    }
-                    $query->innerJoin($column, $joinWith[$i]);
                 }
             }
         }
 
+
         foreach($nqlQuery->getOrderBy()->getColumns() as $column) {
-            $query->addOrderBy((is_null($column->getAlias()) ? $columnDefaultAlias : $column->getAlias()) . "." . $column->getName(), $column->getOrdering());
+            $query->addOrderBy((count($column->getJoinWith()) ? $column->getJoinWith()[count($column->getJoinWith()) -1] : (is_null($column->getAlias()) ? $columnDefaultAlias : $column->getAlias())) . "." . $column->getName(), $column->getOrdering());
         }
 
         if (!is_null($nqlQuery->getLimit())) {
@@ -205,11 +211,14 @@ class DQLConverter
     {
         $columns = array();
         foreach ($select->getColumns() as $column) {
-            $columns[] = $column;
+            $columns[$column->getFullName()] = $column;
         }
         $whereColumns = $this->getAllColumnsFromWhere($where->getConditions());
         foreach ($whereColumns as $column) {
-            $columns[] = $column;
+            $columns[$column->getFullName()] = $column;
+        }
+        foreach($orderBy->getColumns() as $column) {
+            $columns[$column->getFullName()] = $column;
         }
 
         return $columns;

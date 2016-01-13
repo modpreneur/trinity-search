@@ -85,13 +85,13 @@ class Column
     function getFullName()
     {
         $fullName = $this->getName();
-        if(count($this->joinWith)) {
-            $count = count($this->joinWith);
-
-            if($count > 1) {
+        $joinCount = count($this->joinWith);
+        if($joinCount) {
+            if($joinCount > 1) {
                 $fullName = implode('.', $this->joinWith) . "." . $fullName;
             } else {
-                $fullName = $this->joinWith[0] . $fullName;
+
+                $fullName = $this->joinWith[0] . "." . $fullName;
             }
         }
         if(!is_null($this->alias))
@@ -116,7 +116,7 @@ class Column
             $name = $match['column'];
             $alias = is_null($alias) ? $match['alias'] : $alias;
             $function = $match['function'];
-            $joinWith = is_null($alias) ? $match['alias'] : explode(":",$match['joinWith']);
+            $joinWith = is_null($alias) ? $match['alias'] : StringUtils::isEmpty($match['joinWith']) ? [] : explode(":",$match['joinWith']);
 
             return new Column($name, $alias, $function, $joinWith);
         } else {
