@@ -205,9 +205,10 @@ class DQLConverter
     /**
      * @param Select $select
      * @param Where $where
+     * @param OrderBy $orderBy
      * @return Column[]
      */
-    private function getAllColumns(Select $select, Where $where)
+    private function getAllColumns(Select $select, Where $where, OrderBy $orderBy)
     {
         $columns = array();
         foreach ($select->getColumns() as $column) {
