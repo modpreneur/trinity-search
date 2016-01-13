@@ -21,7 +21,7 @@ Append query to the base route. Query can be composed of:
 ```
 * (optional) Conditions - put conditions into curly brackets. Available operators: <, >, =, <=, >=, !=, AND, OR
 ```sh
-{column1 > 500 AND column2 < 800 OR (column3 = JohnDoe AND column4 <= 20)}
+{column1 > 500 AND column2 < 800 OR (column3 = "JohnDoe" AND column4 <= 20)}
 ```
 * (optional) Limit - for limit 5 rows simply append
 ```sh
