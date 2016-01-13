@@ -64,7 +64,9 @@ class DefaultController extends FOSRestController
                 $result[] = $this->select($search, $select->getColumns(), $entity);
             }
 
-            return $result;
+            return new Response(SerializerBuilder::create()
+                ->setPropertyNamingStrategy(new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy()))
+                ->build()->serialize($result, 'json'));
         }
     }
 
