@@ -11,8 +11,12 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\View;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcher;
+use JMS\Serializer\Naming\SerializedNameAnnotationStrategy;
+use JMS\Serializer\SerializerBuilder;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Trinity\Bundle\SearchBundle\PassThroughNamingStrategy;
 
 
 /**
@@ -46,8 +50,11 @@ class DefaultController extends FOSRestController
 
             $entities = $nqlQuery->getQueryBuilder($skipSelection)->getQuery()->getResult();
 
-            if(!$skipSelection)
-                return $entities;
+            if(!$skipSelection) {
+                return new Response(SerializerBuilder::create()
+                    ->setPropertyNamingStrategy(new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy()))
+                    ->build()->serialize($entities, 'json'));
+            }
 
             $result = [];
 
