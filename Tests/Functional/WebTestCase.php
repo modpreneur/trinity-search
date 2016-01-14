@@ -21,12 +21,43 @@ use Trinity\Bundle\SearchBundle\Tests\TestCase;
  */
 class WebTestCase extends TestCase
 {
-
-
     /**
      * @var App
      */
     protected static $application;
+
+    /**
+     * @var bool
+     */
+    protected $isInit = false;
+
+
+    protected function init()
+    {
+
+        if ($this->isInit === false) {
+
+            exec('php console.php doctrine:database:drop --force');
+            exec('php console.php doctrine:schema:create');
+            exec('php console.php doctrine:schema:update');
+
+            $kernel = $this->createClient()->getKernel();
+            $container = $kernel->getContainer();
+            $em = $container->get('doctrine.orm.default_entity_manager');
+
+            $data = new DataSet();
+            $data->load($em);
+        }
+
+        $this->isInit = true;
+    }
+
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->init();
+    }
 
 
     /**
@@ -62,7 +93,8 @@ class WebTestCase extends TestCase
      * @param string $serviceName
      * @return object
      */
-    protected function get($serviceName){
+    protected function get($serviceName)
+    {
         $kernel = $this->createClient()->getKernel();
         $container = $kernel->getContainer();
 
@@ -75,7 +107,8 @@ class WebTestCase extends TestCase
      * @param $queryParams
      * @return Response
      */
-    protected function table($tableName, $queryParams = ""){
+    protected function table($tableName, $queryParams = "")
+    {
 
         $search = $this->get('trinity.search');
 
@@ -103,10 +136,9 @@ class WebTestCase extends TestCase
                 $result[] = $this->select($search, $select->getColumns(), $entity);
             }
 
-            return
-                SerializerBuilder::create()->setPropertyNamingStrategy(
-                    new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy())
-                )->build()->serialize($result, 'json');
+            return SerializerBuilder::create()->setPropertyNamingStrategy(
+                new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy())
+            )->build()->serialize($result, 'json');
 
         }
     }
@@ -142,7 +174,8 @@ class WebTestCase extends TestCase
      * @param $rows
      * @return mixed|string
      */
-    protected function toJson($rows){
+    protected function toJson($rows)
+    {
         $json = SerializerBuilder::create()->setPropertyNamingStrategy(
             new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy())
         )->build()->serialize($rows, 'json');
