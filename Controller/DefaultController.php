@@ -84,11 +84,7 @@ class DefaultController extends FOSRestController
             $fullName = $column->getFullName();
             $value = $search->getValue($entity, $fullName);
 
-            if(is_array($value)) {
-                $key = count($column->getJoinWith()) ? $column->getJoinWith()[0] : $column->getName();
-            } else {
-                $key = $fullName;
-            }
+            $key = count($column->getJoinWith()) ? $column->getJoinWith()[0] : $column->getName();
 
             if(array_key_exists($key, $attributes)) {
                 $attributes[$key] = array_replace_recursive($attributes[$key], $value);
