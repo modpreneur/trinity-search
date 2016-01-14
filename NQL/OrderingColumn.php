@@ -1,17 +1,20 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: martinmatejka
- * Date: 12.01.16
- * Time: 11:52
+ * This file is part of Trinity package.
  */
 
 namespace Trinity\Bundle\SearchBundle\NQL;
 
 
+/**
+ * Class OrderingColumn
+ * @package Trinity\Bundle\SearchBundle\NQL
+ */
 class OrderingColumn extends Column
 {
+    /** @var string  */
     private $ordering = "ASC";
+
 
     /**
      * @return string
@@ -20,12 +23,14 @@ class OrderingColumn extends Column
         return $this->ordering;
     }
 
+
     /**
      * @param string $ordering
      */
     private function setOrdering($ordering) {
         $this->ordering = $ordering;
     }
+
 
     /**
      * @param Column $column
@@ -34,6 +39,7 @@ class OrderingColumn extends Column
     private static function wrap(Column $column) : OrderingColumn {
         return new OrderingColumn($column->getName(), $column->getAlias(), $column->getWrappingFunction(), $column->getJoinWith());
     }
+
 
     /**
      * @param string $str
