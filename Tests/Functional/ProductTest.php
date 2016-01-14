@@ -16,11 +16,26 @@ use Trinity\Bundle\SearchBundle\Tests\Functional\Entity\Product;
 class ProductTest extends WebTestCase
 {
 
+    /*
+     *
+     * (name)
+     * (id, name)
+     *
+     * {id > 8}
+     * {id>1 AND id<3}
+     * {id != 1}
+     *
+     */
+
+
     public function getAllProducts()
     {
-        $repository = $this->get('doctrine.orm.default_entity_manager')->getRepository('Search:Product');
+        $repository = $this
+            ->get('doctrine.orm.default_entity_manager')
+            ->getRepository('Search:Product');
 
-        $products = $repository->findAll();
+        $products = $repository
+            ->findAll();
 
         return $products;
     }
