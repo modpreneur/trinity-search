@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application as App;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\HttpFoundation\Response;
 use Trinity\Bundle\SearchBundle\PassThroughNamingStrategy;
+use Trinity\Bundle\SearchBundle\Search;
 use Trinity\Bundle\SearchBundle\Tests\TestCase;
 
 
@@ -110,5 +111,30 @@ class WebTestCase extends TestCase
         }
     }
 
+
+    /**
+     * @param  Search $search
+     * @param  Column[] $columns
+     * @param  object $entity
+     * @return array
+     */
+    private function select(Search $search, $columns, $entity) : array
+    {
+        $attributes = [];
+        foreach ($columns as $column) {
+            $fullName = $column->getFullName();
+            $value = $search->getValue($entity, $fullName);
+
+            $key = count($column->getJoinWith()) ? $column->getJoinWith()[0] : $column->getName();
+
+            if (array_key_exists($key, $attributes)) {
+                $attributes[$key] = array_replace_recursive($attributes[$key], $value);
+            } else {
+                $attributes[$key] = $value;
+            }
+        }
+
+        return $attributes;
+    }
 
 }

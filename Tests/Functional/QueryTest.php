@@ -55,7 +55,9 @@ class QueryTest extends WebTestCase
      *
      */
     public function testAllProduct(){
-        $repository = $this->get('doctrine.orm.default_entity_manager')->getRepository('Search:Product');
+        $repository = $this
+            ->get('doctrine.orm.default_entity_manager')
+            ->getRepository('Search:Product');
         $products = $repository->findAll();
         $rows = [];
 
@@ -64,7 +66,6 @@ class QueryTest extends WebTestCase
          */
         foreach($products as $product){
             $rows[] = [
-
                 'id' => $product->getId(),
                 'name' => $product->getName(),
                 'shipping' => [
@@ -79,6 +80,30 @@ class QueryTest extends WebTestCase
         )->build()->serialize($rows, 'json');
 
         $this->assertEquals($json, $this->table('product'));
+    }
+
+
+    public function testAllProduct_name(){
+        $repository = $this
+            ->get('doctrine.orm.default_entity_manager')
+            ->getRepository('Search:Product');
+        $products = $repository->findAll();
+        $rows = [];
+
+        /**
+         * @var Product[] $products
+         */
+        foreach($products as $product){
+            $rows[] = [
+                'name' => $product->getName(),
+            ];
+        }
+
+        $json = SerializerBuilder::create()->setPropertyNamingStrategy(
+            new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy())
+        )->build()->serialize($rows, 'json');
+
+        $this->assertEquals($json, $this->table('product', '(name)'));
     }
 
 }
