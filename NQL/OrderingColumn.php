@@ -48,7 +48,7 @@ class OrderingColumn extends Column
      * @return OrderingColumn
      * @throws \Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException
      */
-    public static function parse($str, $ordering = "ASC", $alias = null) : OrderingColumn
+    public static function parse($str, $ordering = "ASC", $alias = null)
     {
         $column = self::wrap(parent::parse($str, $alias));
         $column->setOrdering($ordering);

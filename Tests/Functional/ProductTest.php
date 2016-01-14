@@ -272,8 +272,16 @@ class ProductTest extends WebTestCase
 
         $p = [];
 
+        $p[] = $products[9];
+        $p[] = $products[8];
+        $p[] = $products[7];
+        $p[] = $products[6];
+        $p[] = $products[5];
+        $p[] = $products[4];
+        $p[] = $products[3];
         $p[] = $products[2];
         $p[] = $products[1];
+        $p[] = $products[0];
 
         $this->assertEquals(
             $this->toJson($p),

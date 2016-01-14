@@ -119,7 +119,7 @@ class Column
      * @return Column
      * @throws SyntaxErrorException
      */
-    public static function parse($str, $alias = null) : Column
+    public static function parse($str, $alias = null)
     {
         $match = array();
         $column = trim($str);
