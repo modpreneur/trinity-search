@@ -5,6 +5,11 @@
 
 namespace Trinity\Bundle\SearchBundle\Tests\Functional;
 
+use JMS\Serializer\Naming\SerializedNameAnnotationStrategy;
+use JMS\Serializer\SerializerBuilder;
+use Trinity\Bundle\SearchBundle\PassThroughNamingStrategy;
+use Trinity\Bundle\SearchBundle\Tests\Functional\Entity\Product;
+
 
 /**
  * Class ToDoTest
@@ -42,29 +47,38 @@ class QueryTest extends WebTestCase
     public function setUp()
     {
         parent::setUp();
-
-        $kernel = $this->createClient()->getKernel();
-        $container = $kernel->getContainer();
-        $search = $container->get('trinity.search');
-
-
         $this->init();
     }
-
-
-    // -----
 
 
     /**
      *
      */
-    public function testParse(){
+    public function testAllProduct(){
+        $repository = $this->get('doctrine.orm.default_entity_manager')->getRepository('Search:Product');
+        $products = $repository->findAll();
+        $rows = [];
 
-        $kernel = $this->createClient()->getKernel();
-        $container = $kernel->getContainer();
-        $search = $container->get('trinity.search');
+        /**
+         * @var Product[] $products
+         */
+        foreach($products as $product){
+            $rows[] = [
 
+                'id' => $product->getId(),
+                'name' => $product->getName(),
+                'shipping' => [
+                    'id' => $product->getShipping()->getId(),
+                    'price' => $product->getShipping()->getPrice()
+                ]
+            ];
+        }
 
+        $json = SerializerBuilder::create()->setPropertyNamingStrategy(
+            new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy())
+        )->build()->serialize($rows, 'json');
+
+        $this->assertEquals($json, $this->table('product'));
     }
 
 }
