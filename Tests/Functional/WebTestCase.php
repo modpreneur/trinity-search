@@ -137,4 +137,17 @@ class WebTestCase extends TestCase
         return $attributes;
     }
 
+
+    /**
+     * @param $rows
+     * @return mixed|string
+     */
+    protected function toJson($rows){
+        $json = SerializerBuilder::create()->setPropertyNamingStrategy(
+            new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy())
+        )->build()->serialize($rows, 'json');
+
+        return $json;
+    }
+
 }

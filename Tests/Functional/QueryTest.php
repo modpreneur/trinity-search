@@ -51,14 +51,21 @@ class QueryTest extends WebTestCase
     }
 
 
-    /**
-     *
-     */
-    public function testAllProduct(){
+    public function getAllProducts(){
         $repository = $this
             ->get('doctrine.orm.default_entity_manager')
             ->getRepository('Search:Product');
         $products = $repository->findAll();
+
+        return $products;
+    }
+
+
+    /**
+     *
+     */
+    public function testAllProduct(){
+        $products = $this->getAllProducts();
         $rows = [];
 
         /**
@@ -75,19 +82,15 @@ class QueryTest extends WebTestCase
             ];
         }
 
-        $json = SerializerBuilder::create()->setPropertyNamingStrategy(
-            new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy())
-        )->build()->serialize($rows, 'json');
-
-        $this->assertEquals($json, $this->table('product'));
+        $this->assertEquals(
+            $this->toJson($rows),
+            $this->table('product')
+        );
     }
 
 
     public function testAllProduct_name(){
-        $repository = $this
-            ->get('doctrine.orm.default_entity_manager')
-            ->getRepository('Search:Product');
-        $products = $repository->findAll();
+        $products = $this->getAllProducts();
         $rows = [];
 
         /**
@@ -99,19 +102,15 @@ class QueryTest extends WebTestCase
             ];
         }
 
-        $json = SerializerBuilder::create()->setPropertyNamingStrategy(
-            new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy())
-        )->build()->serialize($rows, 'json');
-
-        $this->assertEquals($json, $this->table('product', '(name)'));
+        $this->assertEquals(
+            $this->toJson($rows),
+            $this->table('product', '(name)')
+        );
     }
 
 
     public function testAllProduct_id_name(){
-        $repository = $this
-            ->get('doctrine.orm.default_entity_manager')
-            ->getRepository('Search:Product');
-        $products = $repository->findAll();
+        $products = $this->getAllProducts();
         $rows = [];
 
         /**
@@ -124,11 +123,10 @@ class QueryTest extends WebTestCase
             ];
         }
 
-        $json = SerializerBuilder::create()->setPropertyNamingStrategy(
-            new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy())
-        )->build()->serialize($rows, 'json');
-
-        $this->assertEquals($json, $this->table('product', '(id, name)'));
+        $this->assertEquals(
+            $this->toJson($rows),
+            $this->table('product', '(id, name)')
+        );
     }
 
 }
