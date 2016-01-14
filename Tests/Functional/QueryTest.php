@@ -23,8 +23,9 @@ class QueryTest extends WebTestCase
 
         if($this->isInit === false){
 
-            //dump(exec('php console.php doctrine:database:drop --force'));
-            //dump(exec('php console.php doctrine:database:create'));
+            exec('php console.php doctrine:database:drop --force');
+            exec('php console.php doctrine:schema:create');
+            exec('php console.php doctrine:schema:update');
 
             $kernel    = $this->createClient()->getKernel();
             $container = $kernel->getContainer();
