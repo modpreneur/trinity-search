@@ -5,8 +5,9 @@
 
 namespace Trinity\Bundle\SearchBundle;
 
+use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Trinity\Bundle\SearchBundle\NQL\DQLConverter;
+use Trinity\Bundle\SeixarchBundle\NQL\DQLConverter;
 use Trinity\Bundle\SearchBundle\NQL\NQLQuery;
 use Trinity\FrameworkBundle\Utils\ObjectMixin;
 
