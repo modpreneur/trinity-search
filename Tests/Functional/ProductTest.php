@@ -24,6 +24,7 @@ class ProductTest extends WebTestCase
      * {id > 8}
      * {id>1 AND id<3}
      * {id != 1}
+     * {id = 1 OR id = 2}
      *
      */
 
@@ -198,6 +199,25 @@ class ProductTest extends WebTestCase
         $this->assertEquals(
             $this->toJson($p),
             $this->table('product', '{id != 1}')
+        );
+    }
+
+
+    /**
+     * id = 1 OR id = 2
+     */
+    public function testOR()
+    {
+        $products = $this->getAllProducts();
+
+        $p = [];
+
+        $p[] = $products[0];
+        $p[] = $products[1];
+
+        $this->assertEquals(
+            $this->toJson($p),
+            $this->table('product', '{id = 1 OR id = 2}')
         );
     }
 
