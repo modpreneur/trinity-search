@@ -6,7 +6,10 @@
 namespace Trinity\Bundle\SearchBundle;
 
 use Doctrine\ORM\PersistentCollection;
+use JMS\Serializer\Naming\SerializedNameAnnotationStrategy;
+use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Trinity\Bundle\SearchBundle\NQL\Column;
 use Trinity\Bundle\SearchBundle\NQL\DQLConverter;
 use Trinity\Bundle\SearchBundle\NQL\NQLQuery;
 use Trinity\FrameworkBundle\Utils\ObjectMixin;
@@ -82,7 +85,7 @@ final class Search
      * @param \Exception|null $previous
      * @return NotFoundHttpException
      */
-    public static function createNotFoundException($message = 'Not Found', \Exception $previous = null)
+    private static function createNotFoundException($message = 'Not Found', \Exception $previous = null)
     {
         return new NotFoundHttpException($message, $previous);
     }
@@ -131,5 +134,68 @@ final class Search
         } catch (\Exception $ex) {
             return "";
         }
+    }
+
+
+    /**
+     * @param NQLQuery $nqlQuery
+     * @param bool $skipSelection
+     * @return mixed|string
+     */
+    public function convertToJson(NQLQuery $nqlQuery, bool $skipSelection) {
+        $entities = $nqlQuery->getQueryBuilder($skipSelection)->getQuery()->getResult();
+
+        if (!$skipSelection) {
+            return SerializerBuilder::create()->setPropertyNamingStrategy(
+                new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy())
+            )->build()->serialize($entities, 'json');
+        }
+
+        $result = [];
+
+        $select = $nqlQuery->getSelect();
+
+        foreach ($entities as $entity) {
+            $result[] = $this->select($select->getColumns(), $entity);
+        }
+
+        return SerializerBuilder::create()->setPropertyNamingStrategy(
+            new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy())
+        )->build()->serialize($result, 'json');
+    }
+
+
+    /**
+     * @param array $entities
+     * @return mixed|string
+     */
+    public function convertArrayToJson(array $entities) {
+        return SerializerBuilder::create()->setPropertyNamingStrategy(
+            new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy())
+        )->build()->serialize($entities, 'json');
+    }
+
+    /**
+     * @param  Column[] $columns
+     * @param  object $entity
+     * @return array
+     */
+    private function select($columns, $entity) : array
+    {
+        $attributes = [];
+        foreach ($columns as $column) {
+            $fullName = $column->getFullName();
+            $value = $this->getValue($entity, $fullName);
+
+            $key = count($column->getJoinWith()) ? $column->getJoinWith()[0] : $column->getName();
+
+            if (array_key_exists($key, $attributes)) {
+                $attributes[$key] = array_replace_recursive($attributes[$key], $value);
+            } else {
+                $attributes[$key] = $value;
+            }
+        }
+
+        return $attributes;
     }
 }
