@@ -106,4 +106,29 @@ class QueryTest extends WebTestCase
         $this->assertEquals($json, $this->table('product', '(name)'));
     }
 
+
+    public function testAllProduct_id_name(){
+        $repository = $this
+            ->get('doctrine.orm.default_entity_manager')
+            ->getRepository('Search:Product');
+        $products = $repository->findAll();
+        $rows = [];
+
+        /**
+         * @var Product[] $products
+         */
+        foreach($products as $product){
+            $rows[] = [
+                'id' => $product->getId(),
+                'name' => $product->getName(),
+            ];
+        }
+
+        $json = SerializerBuilder::create()->setPropertyNamingStrategy(
+            new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy())
+        )->build()->serialize($rows, 'json');
+
+        $this->assertEquals($json, $this->table('product', '(id, name)'));
+    }
+
 }
