@@ -25,6 +25,8 @@ class ProductTest extends WebTestCase
      * {id>1 AND id<3}
      * {id != 1}
      * {id = 1 OR id = 2}
+     * LIMIT=2
+     * LIMIT=2 OFFSET=1
      *
      */
 
@@ -218,6 +220,44 @@ class ProductTest extends WebTestCase
         $this->assertEquals(
             $this->toJson($p),
             $this->table('product', '{id = 1 OR id = 2}')
+        );
+    }
+
+
+    /**
+     * LIMIT=2
+     */
+    public function testLimit(){
+
+        $products = $this->getAllProducts();
+
+        $p = [];
+
+        $p[] = $products[0];
+        $p[] = $products[1];
+
+        $this->assertEquals(
+            $this->toJson($p),
+            $this->table('product', 'LIMIT=2')
+        );
+    }
+
+
+    /**
+     * offset=2
+     */
+    public function testOffset(){
+
+        $products = $this->getAllProducts();
+
+        $p = [];
+
+        $p[] = $products[1];
+        $p[] = $products[2];
+
+        $this->assertEquals(
+            $this->toJson($p),
+            $this->table('product', 'LIMIT=2 OFFSET=1')
         );
     }
 
