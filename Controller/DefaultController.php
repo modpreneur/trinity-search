@@ -44,54 +44,60 @@ class DefaultController extends FOSRestController
 
         if ($tableName === "global") {
             return $search->queryGlobal($queryParams);
-        }
-        else {
+        } else {
             $nqlQuery = $search->queryTable($tableName, $queryParams);
 
             $skipSelection = count($nqlQuery->getSelect()->getColumns());
 
             $entities = $nqlQuery->getQueryBuilder($skipSelection)->getQuery()->getResult();
 
-            if(!$skipSelection) {
-                return new Response(SerializerBuilder::create()
-                    ->setPropertyNamingStrategy(new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy()))
-                    ->build()->serialize($entities, 'json'));
+            if (!$skipSelection) {
+                return new Response(
+                    SerializerBuilder::create()->setPropertyNamingStrategy(
+                            new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy())
+                        )->build()->serialize($entities, 'json'), 200, ['Content-Type' => 'application/json']
+                );
             }
 
             $result = [];
 
             $select = $nqlQuery->getSelect();
 
-            foreach($entities as $entity) {
+            foreach ($entities as $entity) {
                 $result[] = $this->select($search, $select->getColumns(), $entity);
             }
 
-            return new Response(SerializerBuilder::create()
-                ->setPropertyNamingStrategy(new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy()))
-                ->build()->serialize($result, 'json'));
+            return new Response(
+                SerializerBuilder::create()->setPropertyNamingStrategy(
+                        new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy())
+                    )->build()->serialize($result, 'json'), 200, ['Content-Type' => 'application/json']
+            );
         }
     }
 
+
     /**
-     * @param  Search   $search
+     * @param  Search $search
      * @param  Column[] $columns
-     * @param  object   $entity
+     * @param  object $entity
      * @return array
      */
-    private function select(Search $search, $columns, $entity) : array {
+    private function select(Search $search, $columns, $entity) : array
+    {
         $attributes = [];
-        foreach($columns as $column) {
+        foreach ($columns as $column) {
             $fullName = $column->getFullName();
             $value = $search->getValue($entity, $fullName);
 
             $key = count($column->getJoinWith()) ? $column->getJoinWith()[0] : $column->getName();
 
-            if(array_key_exists($key, $attributes)) {
+            if (array_key_exists($key, $attributes)) {
                 $attributes[$key] = array_replace_recursive($attributes[$key], $value);
             } else {
                 $attributes[$key] = $value;
             }
         }
+
         return $attributes;
     }
 }
