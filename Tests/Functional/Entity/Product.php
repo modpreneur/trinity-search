@@ -38,7 +38,7 @@ class Product
 
 
     /**
-     * @ORM\OneToOne(targetEntity="Shipping")
+     * @ORM\OneToOne(targetEntity="Shipping", inversedBy="product")
      * @ORM\JoinColumn(name="shipping_id", referencedColumnName="id")
      */
     private $shipping;

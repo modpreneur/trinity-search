@@ -22,7 +22,7 @@ use Trinity\Bundle\SearchBundle\Search;
 
 
 /**
- * @Route("/admin/search")
+ * @Route("/search")
  */
 class DefaultController extends FOSRestController
 {

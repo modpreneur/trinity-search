@@ -36,7 +36,7 @@ class Shipping
 
 
     /**
-     * @ORM\OneToOne(targetEntity="Product", mappedBy="product")
+     * @ORM\OneToOne(targetEntity="Product", mappedBy="shipping")
      */
     private $product;
 
