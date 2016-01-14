@@ -34,13 +34,17 @@ class DQLConverter
     private $entities;
 
     /** @var string */
-    private $bundleName;
+    private $doctrinePrefix;
+
+    /** @var string */
+    private $namespace;
 
 
     public function __construct(ContainerInterface $container, EntityManager $entityManager)
     {
         $this->em = $entityManager;
-        $this->bundleName = $container->getParameter('trinity.search.bundle');
+        $this->doctrinePrefix = $container->getParameter('trinity.search.doctrine_prefix');
+        $this->namespace = $container->getParameter('trinity.search.namespace');
         $this->fetchAvailableEntities();
     }
 
@@ -71,9 +75,8 @@ class DQLConverter
                 $query->select($columnDefaultAlias);
             }
         }
-
         foreach ($nqlQuery->getFrom()->getTables() as $table) {
-            $query->from($this->bundleName.':'.$table->getName(), $table->getAlias());
+            $query->from($this->doctrinePrefix.':'.$table->getName(), $table->getAlias());
         }
 
         if ($nqlQuery->getWhere()->getConditions()) {
@@ -145,7 +148,7 @@ class DQLConverter
         foreach ($meta as $m) {
             $entityName = substr(strrchr($m->getName(), "\\"), 1);
 
-            if (StringUtils::startsWith(str_replace("\\", "", $m->getName()), $this->bundleName) && !in_array(
+            if (StringUtils::startsWith($m->getName(), $this->namespace) && !in_array(
                     $entityName,
                     self::$ignoredEntities
                 )

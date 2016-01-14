@@ -15,8 +15,8 @@ parameters:
     debug_redirects: false
     use_assetic_controller: true
     locale: en
-    trinity.search.bundle: "SearchBundle"
-
+    trinity.search.doctrine_prefix: "Search"
+    trinity.search.namespace: "Trinity\\Bundle\\SearchBundle\\Tests\\Functional\\Entity"
 
 # Doctrine Configuration
 doctrine:
