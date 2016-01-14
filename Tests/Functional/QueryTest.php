@@ -62,7 +62,7 @@ class QueryTest extends WebTestCase
 
 
     /**
-     *
+     * select all
      */
     public function testAllProduct(){
         $products = $this->getAllProducts();
@@ -89,6 +89,9 @@ class QueryTest extends WebTestCase
     }
 
 
+    /**
+     * select name
+     */
     public function testAllProduct_name(){
         $products = $this->getAllProducts();
         $rows = [];
@@ -109,6 +112,9 @@ class QueryTest extends WebTestCase
     }
 
 
+    /**
+     * select id, name
+     */
     public function testAllProduct_id_name(){
         $products = $this->getAllProducts();
         $rows = [];
