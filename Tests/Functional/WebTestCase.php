@@ -38,9 +38,9 @@ class WebTestCase extends TestCase
 
         if ($this->isInit === false) {
 
-            exec('php console.php doctrine:database:drop --force');
-            exec('php console.php doctrine:schema:create');
-            exec('php console.php doctrine:schema:update');
+            exec('php bin/console.php doctrine:database:drop --force');
+            exec('php bin/console.php doctrine:schema:create');
+            exec('php bin/console.php doctrine:schema:update');
 
             $kernel = $this->createClient()->getKernel();
             $container = $kernel->getContainer();
