@@ -17,12 +17,14 @@ parameters:
     locale: en
     trinity.search.bundle: "SearchBundle"
 
+
 # Doctrine Configuration
 doctrine:
     dbal:
       driver:   "%database_driver%"
       path:     "%kernel.cache_dir%/test.db"
       host:     "%database_host%"
+
     orm:
         auto_generate_proxy_classes: "%kernel.debug%"
         auto_mapping: false
@@ -31,7 +33,7 @@ doctrine:
             type: annotation
             dir: '%kernel.root_dir%/../Entity'
             is_bundle: false
-            prefix: Search/Entity
+            prefix: Trinity\Bundle\SearchBundle\Tests\Functional\Entity
             alias: Search
 
 

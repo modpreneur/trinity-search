@@ -5,7 +5,6 @@
 
 namespace Trinity\Bundle\SearchBundle\NQL;
 
-
 use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
 
 

@@ -51,6 +51,7 @@ class AppKernel extends Kernel
             new \Sensio\Bundle\GeneratorBundle\SensioGeneratorBundle(),
 
 
+
             new \Trinity\FrameworkBundle\TrinityFrameworkBundle(),
             new \Trinity\Bundle\SearchBundle\SearchBundle(),
         );

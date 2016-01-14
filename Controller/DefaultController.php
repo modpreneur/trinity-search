@@ -70,6 +70,7 @@ class DefaultController extends FOSRestController
         }
     }
 
+
     private function select($search, $columns, $entity) {
         $attributes = [];
         foreach($columns as $column) {

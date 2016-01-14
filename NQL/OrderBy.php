@@ -1,10 +1,17 @@
 <?php
+/**
+ * This file is part of Trinity package.
+ */
 
 namespace Trinity\Bundle\SearchBundle\NQL;
 
-
 use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
 
+
+/**
+ * Class OrderBy
+ * @package Trinity\Bundle\SearchBundle\NQL
+ */
 class OrderBy
 {
     /**
@@ -12,9 +19,11 @@ class OrderBy
      */
     private $columns = [];
 
+
     private function __construct()
     {
     }
+
 
     /**
      * @return OrderingColumn[]
@@ -24,10 +33,12 @@ class OrderBy
         return $this->columns;
     }
 
+
     /**
      * @param OrderingColumn[] $columns
      */
-    private function setColumns($columns) {
+    private function setColumns($columns)
+    {
         $this->columns = $columns;
     }
 
@@ -43,22 +54,23 @@ class OrderBy
      * @return OrderBy
      * @throws SyntaxErrorException
      */
-    public static function parse($str) {
+    public static function parse($str)
+    {
         $orderBy = new OrderBy();
 
         $exploded = explode(',', $str);
         $columns = [];
-        foreach($exploded as $item) {
+        foreach ($exploded as $item) {
             $item = trim($item);
             $args = explode(' ', $item);
-            if(count($args) != 2) {
+            if (count($args) != 2) {
                 throw new SyntaxErrorException("Error in order by part");
             }
 
             $col = $args[0];
             $ordering = $args[1];
 
-            if($ordering != "ASC" && $ordering != "DESC") {
+            if ($ordering != "ASC" && $ordering != "DESC") {
                 throw new SyntaxErrorException("Unknown order by direction");
             }
             $column = OrderingColumn::parse($col, $ordering);
@@ -70,7 +82,9 @@ class OrderBy
         return $orderBy;
     }
 
-    public static function getBlank() {
+
+    public static function getBlank()
+    {
         return new OrderBy();
     }
 }

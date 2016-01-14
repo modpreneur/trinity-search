@@ -4,6 +4,7 @@ services:
         class: Trinity\Bundle\SearchBundle\Search
         arguments: ["@trinity.search.dql_converter"]
 
+
     trinity.search.dql_converter:
         class: Trinity\Bundle\SearchBundle\NQL\DQLConverter
         arguments: ["@service_container", "@doctrine.orm.entity_manager"]
