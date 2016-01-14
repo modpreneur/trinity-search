@@ -5,7 +5,7 @@
  */
 set_time_limit(0);
 
-require "Tests/Functional/app/AppKernel.php";
+require "../Tests/Functional/app/AppKernel.php";
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
