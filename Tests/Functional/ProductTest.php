@@ -27,6 +27,7 @@ class ProductTest extends WebTestCase
      * {id = 1 OR id = 2}
      * LIMIT=2
      * LIMIT=2 OFFSET=1
+     * ORDER BY id DESC
      *
      */
 
@@ -260,5 +261,25 @@ class ProductTest extends WebTestCase
             $this->table('product', 'LIMIT=2 OFFSET=1')
         );
     }
+
+
+    /**
+     * order desc
+     */
+    public function testOrderDESC(){
+
+        $products = $this->getAllProducts();
+
+        $p = [];
+
+        $p[] = $products[2];
+        $p[] = $products[1];
+
+        $this->assertEquals(
+            $this->toJson($p),
+            $this->table('product', 'ORDER BY id DESC')
+        );
+    }
+
 
 }
