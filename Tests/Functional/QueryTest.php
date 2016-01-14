@@ -51,8 +51,19 @@ class QueryTest extends WebTestCase
     }
 
 
+    // -----
+
+
+    /**
+     *
+     */
     public function testParse(){
-        $this->assertEquals(1, 1);
+
+        $kernel = $this->createClient()->getKernel();
+        $container = $kernel->getContainer();
+        $search = $container->get('trinity.search');
+
+
     }
 
 }

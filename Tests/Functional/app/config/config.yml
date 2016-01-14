@@ -52,6 +52,8 @@ twig:
     debug:            "%kernel.debug%"
     strict_variables: "%kernel.debug%"
 
+fos_rest:
+    param_fetcher_listener: true
 
 
 services:

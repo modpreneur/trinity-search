@@ -1,0 +1,3 @@
+search:
+    resource: "@SearchBundle/Resources/config/routing.yml"
+    prefix: /

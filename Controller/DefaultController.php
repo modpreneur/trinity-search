@@ -33,8 +33,8 @@ class DefaultController extends FOSRestController
      *
      * @param ParamFetcher $paramFetcher
      *
+     * @param string $tableName
      * @return JsonResponse
-     *
      * @View
      */
     public function tableAction(ParamFetcher $paramFetcher, $tableName)

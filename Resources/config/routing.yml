@@ -1,0 +1,4 @@
+search:
+    path: "/search/{tableName}/"
+    defaults: { _controller: SearchBundle:Default:table}
+

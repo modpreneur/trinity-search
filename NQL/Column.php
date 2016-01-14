@@ -23,6 +23,13 @@ class Column
     private $joinWith;
 
 
+    /**
+     * Column constructor.
+     * @param $name
+     * @param null $alias
+     * @param null $wrappingFunction
+     * @param null $joinWith
+     */
     function __construct($name, $alias = null, $wrappingFunction = null, $joinWith = null)
     {
         $this->name = $name;
