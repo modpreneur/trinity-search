@@ -27,9 +27,13 @@ class DQLConverter
         'Client',
     ];
 
-
+    /** @var EntityManager  */
     private $em;
+
+    /** @var string[] */
     private $entities;
+
+    /** @var string */
     private $bundleName;
 
 
@@ -46,7 +50,7 @@ class DQLConverter
      * @return QueryBuilder
      * @throws SyntaxErrorException
      */
-    public function convert(NQLQuery $nqlQuery, $skipSelection)
+    public function convert(NQLQuery $nqlQuery, $skipSelection) : QueryBuilder
     {
         $this->checkTables($nqlQuery->getFrom());
 
@@ -77,7 +81,6 @@ class DQLConverter
             $query->where($paramWhere['clause'])->setParameters($paramWhere['params']);
         }
 
-        //$columns = $this->getAllColumnsFromWhere($nqlQuery->getWhere()->getConditions());
         $columns = $this->getAllColumns($skipSelection ? Select::getBlank() : $nqlQuery->getSelect(), $nqlQuery->getWhere(), $nqlQuery->getOrderBy());
 
         $alreadyJoined = [];
@@ -153,7 +156,10 @@ class DQLConverter
     }
 
 
-    public function getAvailableEntities()
+    /**
+     * @return string[]
+     */
+    public function getAvailableEntities() : array
     {
         return $this->entities;
     }
@@ -166,7 +172,7 @@ class DQLConverter
      * @return array
      */
 
-    private function getParametrizedWhere($conditions, $columnDefaultAlias = "", &$paramCounter = 0)
+    private function getParametrizedWhere($conditions, $columnDefaultAlias = "", &$paramCounter = 0) : array
     {
         $whereClause = "";
         $whereParams = array();
@@ -208,9 +214,10 @@ class DQLConverter
      * @param OrderBy $orderBy
      * @return Column[]
      */
-    private function getAllColumns(Select $select, Where $where, OrderBy $orderBy)
+    private function getAllColumns(Select $select, Where $where, OrderBy $orderBy) : array
     {
         $columns = array();
+
         foreach ($select->getColumns() as $column) {
             $columns[$column->getFullName()] = $column;
         }
@@ -230,7 +237,7 @@ class DQLConverter
      * @param $conditions
      * @return Column[]
      */
-    private function getAllColumnsFromWhere($conditions)
+    private function getAllColumnsFromWhere($conditions) : array
     {
         $columns = array();
 

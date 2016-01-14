@@ -16,7 +16,9 @@ use JMS\Serializer\SerializerBuilder;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Trinity\Bundle\SearchBundle\NQL\Column;
 use Trinity\Bundle\SearchBundle\PassThroughNamingStrategy;
+use Trinity\Bundle\SearchBundle\Search;
 
 
 /**
@@ -70,7 +72,13 @@ class DefaultController extends FOSRestController
         }
     }
 
-    private function select($search, $columns, $entity) {
+    /**
+     * @param  Search   $search
+     * @param  Column[] $columns
+     * @param  object   $entity
+     * @return array
+     */
+    private function select(Search $search, $columns, $entity) : array {
         $attributes = [];
         foreach($columns as $column) {
             $fullName = $column->getFullName();

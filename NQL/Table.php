@@ -31,7 +31,9 @@ class Table
         $this->alias = is_null($alias) ? $this->getDefaultAlias() : $alias;
     }
 
-
+    /**
+     * @return string
+     */
     private function getDefaultAlias()
     {
         return strtolower($this->name);

@@ -34,7 +34,7 @@ class From
      * @return From
      * @throws SyntaxErrorException
      */
-    public static function parse($str)
+    public static function parse($str) : From
     {
         $from = new From();
 

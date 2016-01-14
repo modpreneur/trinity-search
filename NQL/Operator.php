@@ -41,7 +41,7 @@ class Operator
      * @param string|Operator $operator
      * @return bool
      */
-    public function compareTo($operator)
+    public function compareTo($operator) : bool
     {
         if ($operator instanceof Operator) {
             return $operator->value === $this->value;

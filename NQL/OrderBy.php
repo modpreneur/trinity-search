@@ -7,9 +7,7 @@ use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
 
 class OrderBy
 {
-    /**
-     * @var OrderingColumn[]
-     */
+    /** @var OrderingColumn[] */
     private $columns = [];
 
     private function __construct()
@@ -39,11 +37,11 @@ class OrderBy
 //    }
 
     /**
-     * @param $str
+     * @param string $str
      * @return OrderBy
      * @throws SyntaxErrorException
      */
-    public static function parse($str) {
+    public static function parse($str) : OrderBy {
         $orderBy = new OrderBy();
 
         $exploded = explode(',', $str);
@@ -70,6 +68,9 @@ class OrderBy
         return $orderBy;
     }
 
+    /**
+     * @return OrderBy
+     */
     public static function getBlank() {
         return new OrderBy();
     }

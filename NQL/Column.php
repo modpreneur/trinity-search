@@ -35,7 +35,7 @@ class Column
     /**
      * @return string
      */
-    public function getName()
+    public function getName() : string
     {
         return $this->name;
     }
@@ -49,7 +49,9 @@ class Column
         return $this->wrappingFunction;
     }
 
-
+    /**
+     * @return string|null
+     */
     public function getAlias()
     {
         return $this->alias;
@@ -59,7 +61,7 @@ class Column
     /**
      * @return string[]|null
      */
-    public function getJoinWith()
+    public function getJoinWith() : array
     {
         return $this->joinWith;
     }
@@ -82,7 +84,11 @@ class Column
         $this->joinWith = $joinWith;
     }
 
-    function getFullName()
+
+    /**
+     * @return string
+     */
+    function getFullName() : string
     {
         $fullName = $this->getName();
         $joinCount = count($this->joinWith);
@@ -106,7 +112,7 @@ class Column
      * @return Column
      * @throws SyntaxErrorException
      */
-    public static function parse($str, $alias = null)
+    public static function parse($str, $alias = null) : Column
     {
         $match = array();
         $column = trim($str);
