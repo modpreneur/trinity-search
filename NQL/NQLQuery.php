@@ -14,7 +14,7 @@ use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
  */
 class NQLQuery
 {
-    private static $regSearchQuery = '/^SELECT\s(?<from>[^({]+)(\s(\((?<select>.+)\))?\s*({(?<where>.+)})?)?(\sLIMIT\s*=\s*(?<limit>\d+)(\sOFFSET\s*=\s*(?<offset>\d+))?)?(\sORDER\sBY\s(?<orderby>.+))?$/';
+    private static $regSearchQuery = '/^SELECT\s(?<from>[^({\s]+)(\s(\((?<select>.+)\))?\s*({(?<where>.+)})?)?(\sLIMIT\s*=\s*(?<limit>\d+)(\sOFFSET\s*=\s*(?<offset>\d+))?)?(\sORDER\sBY\s(?<orderby>.+))?$/';
 
     private $select;
     private $from;
@@ -34,7 +34,12 @@ class NQLQuery
     }
 
 
-    public static function parse($str)
+    /**
+     * @param string $str
+     * @return NQLQuery
+     * @throws SyntaxErrorException
+     */
+    public static function parse($str) : NQLQuery
     {
         $query = new NQLQuery();
 
@@ -106,7 +111,7 @@ class NQLQuery
 
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getLimit()
     {
@@ -115,7 +120,7 @@ class NQLQuery
 
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getOffset()
     {
@@ -132,6 +137,7 @@ class NQLQuery
 
 
     /**
+     * @param bool $skipSelection
      * @return \Doctrine\ORM\QueryBuilder|null
      */
     public function getQueryBuilder($skipSelection = false) {

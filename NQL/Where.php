@@ -22,6 +22,9 @@ class Where
      */
     private static $regKeyOpValue = '/^(?<key>[^\s(<>=!]+)\s*(?<operator>[<>!]?=|[<>])\s*(?<value>\"[^\.)]+\"|[^\s)]+)/';
 
+    /**
+     * @var WherePart[]
+     */
     private $conditions = array();
 
 
@@ -36,7 +39,7 @@ class Where
      * @param $str
      * @return Where
      */
-    public static function parse($str = "")
+    public static function parse($str = "") : Where
     {
         $condition = new Where();
         $condition->setConditions(self::parseCondition($str));
@@ -61,7 +64,7 @@ class Where
      * @return array
      * @throws SyntaxErrorException
      */
-    private static function parseCondition($str)
+    private static function parseCondition($str) : array
     {
         $parts = array();
 
@@ -158,7 +161,7 @@ class Where
      * @param $start
      * @return int
      */
-    private static function findPairBracketIndex($str, $start = 1)
+    private static function findPairBracketIndex($str, $start = 1) : int
     {
         $level = 1;
 
@@ -179,7 +182,12 @@ class Where
     }
 
 
-    private static function getErrorContext($str, $index)
+    /**
+     * @param $str
+     * @param $index
+     * @return array
+     */
+    private static function getErrorContext($str, $index) : array
     {
         $length = 16;
         $start = $index >= $length / 2 ? $index - $length / 2 : 0;
@@ -188,7 +196,10 @@ class Where
     }
 
 
-    public static function getBlank()
+    /**
+     * @return Where
+     */
+    public static function getBlank() : Where
     {
         return new Where();
     }
@@ -199,7 +210,7 @@ class Where
      *
      * @return WherePart[]
      */
-    public function getConditions()
+    public function getConditions() : array
     {
         return $this->conditions;
     }

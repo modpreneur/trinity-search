@@ -8,6 +8,10 @@ use JMS\Serializer\Naming\PropertyNamingStrategyInterface;
 
 class PassThroughNamingStrategy implements PropertyNamingStrategyInterface
 {
+    /**
+     * @param PropertyMetadata $metadata
+     * @return string
+     */
     public function translateName(PropertyMetadata $metadata)
     {
         return $metadata->name;

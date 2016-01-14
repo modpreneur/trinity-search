@@ -15,6 +15,7 @@ use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
  */
 class Select
 {
+    /** @var Column[]  */
     private $columns = array();
 
 
@@ -29,7 +30,7 @@ class Select
      * @return Select
      * @throws SyntaxErrorException
      */
-    public static function parse($str = "")
+    public static function parse($str = "") : Select
     {
         $selection = new Select();
 
@@ -48,7 +49,7 @@ class Select
     /**
      * @return Select
      */
-    public static function getBlank()
+    public static function getBlank() : Select
     {
         return new Select();
     }

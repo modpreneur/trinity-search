@@ -13,19 +13,36 @@ class OrderingColumn extends Column
 {
     private $ordering = "ASC";
 
+    /**
+     * @return string
+     */
     public function getOrdering() {
         return $this->ordering;
     }
 
+    /**
+     * @param string $ordering
+     */
     private function setOrdering($ordering) {
         $this->ordering = $ordering;
     }
 
-    private static function wrap(Column $column) {
+    /**
+     * @param Column $column
+     * @return OrderingColumn
+     */
+    private static function wrap(Column $column) : OrderingColumn {
         return new OrderingColumn($column->getName(), $column->getAlias(), $column->getWrappingFunction(), $column->getJoinWith());
     }
 
-    public static function parse($str, $ordering = "ASC", $alias = null)
+    /**
+     * @param string $str
+     * @param string $ordering
+     * @param string|null $alias
+     * @return OrderingColumn
+     * @throws \Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException
+     */
+    public static function parse($str, $ordering = "ASC", $alias = null) : OrderingColumn
     {
         $column = self::wrap(parent::parse($str, $alias));
         $column->setOrdering($ordering);

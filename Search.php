@@ -5,6 +5,7 @@
 
 namespace Trinity\Bundle\SearchBundle;
 
+use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Trinity\Bundle\SearchBundle\NQL\DQLConverter;
 use Trinity\Bundle\SearchBundle\NQL\NQLQuery;
@@ -17,6 +18,7 @@ use Trinity\FrameworkBundle\Utils\ObjectMixin;
  */
 final class Search
 {
+    /** @var DQLConverter  */
     private $dqlConverter;
 
     public function __construct(DQLConverter $dqlConverter)
@@ -30,7 +32,7 @@ final class Search
      * @return NQLQuery
      * @throws NotFoundHttpException
      */
-    public function queryTable($tableName, $queryParams)
+    public function queryTable($tableName, $queryParams) : NQLQuery
     {
         $query = "SELECT e.".$tableName." ".$queryParams;
 
@@ -46,7 +48,7 @@ final class Search
      * @return array
      * @throws NotFoundHttpException
      */
-    public function queryGlobal($queryParams) {
+    public function queryGlobal($queryParams) : array {
         $results = array();
 
         foreach ($this->dqlConverter->getAvailableEntities() as $entity) {
@@ -68,37 +70,61 @@ final class Search
      * @return NQLQuery
      * @throws Exception\SyntaxErrorException
      */
-    public function query($query) {
+    public function query($query) : NQLQuery {
         $nqlQuery = NQLQuery::parse(trim($query));
         $nqlQuery->setDqlConverter($this->dqlConverter);
 
         return $nqlQuery;
     }
 
+    /**
+     * @param string $message
+     * @param \Exception|null $previous
+     * @return NotFoundHttpException
+     */
     public static function createNotFoundException($message = 'Not Found', \Exception $previous = null)
     {
         return new NotFoundHttpException($message, $previous);
     }
 
+    /**
+     * @param object $entity
+     * @param string $value
+     * @return array|mixed|string
+     */
     public static function getValue($entity, $value) {
         $values = explode(".", $value);
 
         return self::getObject($entity, $values, 0);
     }
 
+    /**
+     * @param object $entity
+     * @param string[] $values
+     * @param int $curValueIndex
+     * @return array|mixed|string
+     */
     private static function getObject($entity, $values, $curValueIndex) {
         try {
             $obj = ObjectMixin::get($entity, $values[$curValueIndex]);
             if ($curValueIndex == count($values) - 1) {
-                return $obj;
+                return $curValueIndex ? array($values[$curValueIndex] => $obj) : $obj;
             } else if ($obj instanceof PersistentCollection) {
                 $items = [];
                 foreach ($obj as $item) {
-                    $items[] = array($values[$curValueIndex + 1] => self::getObject($item, $values, $curValueIndex + 1));
+                    if($curValueIndex == 0) {
+                        $items[] = self::getObject($item, $values, $curValueIndex + 1);
+                    } else {
+                        $items[$values[$curValueIndex]][] = self::getObject($item, $values, $curValueIndex + 1);
+                    }
                 }
                 return $items;
             } else if (is_object($obj)) {
-                return self::getObject($obj, $values, $curValueIndex + 1);
+                if($curValueIndex == 0) {
+                    return self::getObject($obj, $values, $curValueIndex + 1);
+                } else {
+                    return array($values[$curValueIndex] => self::getObject($obj, $values, $curValueIndex + 1));
+                }
             } else {
                 return $obj;
             }
