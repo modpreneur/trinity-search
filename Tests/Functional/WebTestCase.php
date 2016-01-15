@@ -30,13 +30,13 @@ class WebTestCase extends TestCase
     /**
      * @var bool
      */
-    protected $isInit = false;
+    protected static $isInit = false;
 
 
     protected function init()
     {
 
-        if ($this->isInit === false) {
+        if (self::$isInit === false) {
 
             exec('php bin/console.php doctrine:database:drop --force');
             exec('php bin/console.php doctrine:schema:create');
@@ -50,7 +50,7 @@ class WebTestCase extends TestCase
             $data->load($em);
         }
 
-        $this->isInit = true;
+        self::$isInit = true;
     }
 
 
@@ -133,7 +133,9 @@ class WebTestCase extends TestCase
     {
         $json = SerializerBuilder::create()->setPropertyNamingStrategy(
             new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy())
-        )->build()->serialize($rows, 'json');
+        )
+        ->build()
+        ->serialize($rows, 'json');
 
         return $json;
     }
