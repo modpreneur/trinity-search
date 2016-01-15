@@ -289,5 +289,4 @@ class ProductTest extends WebTestCase
         );
     }
 
-
 }
