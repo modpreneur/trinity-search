@@ -190,7 +190,9 @@ final class Search
             $key = count($column->getJoinWith()) ? $column->getJoinWith()[0] : $column->getName();
 
             if (array_key_exists($key, $attributes)) {
-                $attributes[$key] = array_replace_recursive($attributes[$key], $value);
+                if(is_array($attributes[$key]) && is_array($value)) {
+                    $attributes[$key] = array_replace_recursive($attributes[$key], $value);
+                }
             } else {
                 $attributes[$key] = $value;
             }
