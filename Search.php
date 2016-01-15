@@ -110,30 +110,32 @@ final class Search
     private static function getObject($entity, $values, $curValueIndex) {
         try {
             $obj = ObjectMixin::get($entity, $values[$curValueIndex]);
-            if ($curValueIndex == count($values) - 1) {
-                return $curValueIndex ? array($values[$curValueIndex] => $obj) : $obj;
-            } else if ($obj instanceof PersistentCollection) {
-                $items = [];
-                foreach ($obj as $item) {
-                    if($curValueIndex == 0) {
-                        $items[] = self::getObject($item, $values, $curValueIndex + 1);
-                    } else {
-                        $items[$values[$curValueIndex]][] = self::getObject($item, $values, $curValueIndex + 1);
-                    }
-                }
-                return $items;
-            } else if (is_object($obj)) {
-                if($curValueIndex == 0) {
-                    return self::getObject($obj, $values, $curValueIndex + 1);
-                } else {
-                    return array($values[$curValueIndex] => self::getObject($obj, $values, $curValueIndex + 1));
-                }
-            } else {
-                return $obj;
-            }
         } catch (\Exception $ex) {
-            return "";
+            $obj = "";
         }
+
+        if ($curValueIndex == count($values) - 1) {
+            return $curValueIndex ? array($values[$curValueIndex] => $obj) : $obj;
+        } else if ($obj instanceof PersistentCollection) {
+            $items = [];
+            foreach ($obj as $item) {
+                if($curValueIndex == 0) {
+                    $items[] = self::getObject($item, $values, $curValueIndex + 1);
+                } else {
+                    $items[$values[$curValueIndex]][] = self::getObject($item, $values, $curValueIndex + 1);
+                }
+            }
+            return $items;
+        } else if (is_object($obj)) {
+            if($curValueIndex == 0) {
+                return self::getObject($obj, $values, $curValueIndex + 1);
+            } else {
+                return array($values[$curValueIndex] => self::getObject($obj, $values, $curValueIndex + 1));
+            }
+        } else {
+            return array($values[$curValueIndex] => self::getObject($obj, $values, $curValueIndex + 1));
+        }
+
     }
 
 
