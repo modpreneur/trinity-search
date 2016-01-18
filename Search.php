@@ -133,7 +133,12 @@ final class Search
                 return array($values[$curValueIndex] => self::getObject($obj, $values, $curValueIndex + 1));
             }
         } else {
-            return array($values[$curValueIndex] => self::getObject($obj, $values, $curValueIndex + 1));
+            if($curValueIndex == 0) {
+                return self::getObject($obj, $values, $curValueIndex + 1);
+            } else {
+                return array($values[$curValueIndex] => self::getObject($obj, $values, $curValueIndex + 1));
+            }
+
         }
 
     }
