@@ -250,7 +250,7 @@ class DQLConverter
                 $columns[] = $cond->key;
             } else {
                 if ($cond->type == WherePartType::SUBCONDITION) {
-                    $subColumns = $this->getAllColumnsFromWhere($conditions);
+                    $subColumns = $this->getAllColumnsFromWhere($cond->subTree);
 
                     foreach ($subColumns as $subColumn) {
                         $columns[] = $subColumn;

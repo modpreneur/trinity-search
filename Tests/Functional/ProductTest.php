@@ -175,14 +175,10 @@ class ProductTest extends WebTestCase
             $this->table('product', '{id>1 AND id<3}')
         );
 
-
-        /** @todo Martin Matějka */
-        /*
         $this->assertEquals(
             $this->toJson($p),
             $this->table('product', '{ (id>1)  AND id < 3}')
         );
-        */
     }
 
 
