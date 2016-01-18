@@ -56,7 +56,8 @@ class OrderBy
             $col = $args[0];
             $ordering = $args[1];
 
-            if($ordering != "ASC" && $ordering != "DESC") {
+            if(strcasecmp($ordering,"ASC") != 0 && strcasecmp($ordering,"DESC") != 0)
+            {
                 throw new SyntaxErrorException("Unknown order by direction");
             }
             $column = OrderingColumn::parse($col, $ordering);

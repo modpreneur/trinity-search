@@ -14,7 +14,7 @@ use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
  */
 class NQLQuery
 {
-    private static $regSearchQuery = '/^SELECT\s(?<from>[^({\s]+)(\s(\((?<select>.*)\))?\s*({(?<where>.*)})?)?(\sLIMIT\s*=\s*(?<limit>\d+)(\sOFFSET\s*=\s*(?<offset>\d+))?)?(\sORDER\sBY\s(?<orderby>.+))?$/';
+    private static $regSearchQuery = '/^SELECT\s(?<from>[^({\s]+)(\s(\((?<select>.*)\))?\s*({(?<where>.*)})?)?(\s((?i)LIMIT)\s*=\s*(?<limit>\d+)(\s((?i)OFFSET)\s*=\s*(?<offset>\d+))?)?(\s((?i)ORDERBY)\s(?<orderby>.+))?$/';
 
     private $select;
     private $from;

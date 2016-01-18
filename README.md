@@ -33,7 +33,7 @@ OFFSET=10
 ```
 * (optional) Ordering - for ordering result, append keyword ORDER BY and then columns and directions by which you want to order, multiple columns ordering are supported - separate columns by comma
 ```sh
-ORDER BY column1 ASC, column2 DESC
+ORDERBY column1 ASC, column2 DESC
 ```
 
 <br />
@@ -42,5 +42,5 @@ ORDER BY column1 ASC, column2 DESC
 ```sh
 /admin/search/product/?q=
 (id,name,defaultBillingPlan:initialPrice)
-{defaultBillingPlan:initialPrice > "14"} LIMIT=10 OFFSET=0 ORDER BY clients:name ASC, defaultBillingPlan:initialPrice DESC
+{defaultBillingPlan:initialPrice > "14"} LIMIT=10 OFFSET=0 ORDERBY clients:name ASC, defaultBillingPlan:initialPrice DESC
 ```

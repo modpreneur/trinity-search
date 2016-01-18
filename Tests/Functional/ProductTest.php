@@ -285,7 +285,7 @@ class ProductTest extends WebTestCase
 
         $this->assertEquals(
             $this->toJson($p),
-            $this->table('product', 'ORDER BY id DESC')
+            $this->table('product', 'ORDERBY id DESC')
         );
     }
 
