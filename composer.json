@@ -16,9 +16,10 @@
     "nette/utils": "~2.3",
     "trinity/framework": "dev-master",
     "friendsofsymfony/rest-bundle": "~1.7",
-    "fzaninotto/faker": "^1.5",
     "sensio/framework-extra-bundle": "~3.0",
-    "jms/serializer-bundle": "~1.1"
+    "jms/serializer-bundle": "~1.1",
+    "friendsofsymfony/user-bundle": "master-dev",
+    "trinity/settings": "dev-master"
   },
 
   "require-dev": {
@@ -26,7 +27,7 @@
     "phpunit/phpunit": "5.1.*",
     "mockery/mockery": "~0.9",
     "symfony/var-dumper": "~3.0",
-    "trinity/settings": "dev-master"
+    "fzaninotto/faker": "^1.5"
   },
 
   "autoload": {
