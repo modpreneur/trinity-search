@@ -54,6 +54,7 @@ class AppKernel extends Kernel
 
             new \Trinity\FrameworkBundle\TrinityFrameworkBundle(),
             new \Trinity\Bundle\SearchBundle\SearchBundle(),
+            new \Trinity\Bundle\SettingsBundle\SettingsBundle(),
         );
     }
 
