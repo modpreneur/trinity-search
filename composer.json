@@ -12,10 +12,9 @@
 
   "require": {
     "php": ">=7",
-    "symfony/framework-bundle": ">=2.8",
+    "symfony/framework-bundle": "~2.8 | ~3.0",
     "nette/utils": "~2.3",
     "trinity/framework": "dev-master",
-    "dmishh/settings-bundle" : "dev-master",
     "friendsofsymfony/rest-bundle": "~1.7",
     "fzaninotto/faker": "^1.5",
     "sensio/framework-extra-bundle": "~3.0",
@@ -26,7 +25,8 @@
     "sensio/generator-bundle": "~3.0",
     "phpunit/phpunit": "5.1.*",
     "mockery/mockery": "~0.9",
-    "symfony/var-dumper": "~3.0"
+    "symfony/var-dumper": "~3.0",
+    "trinity/settings": "dev-master"
   },
 
   "autoload": {
@@ -38,7 +38,7 @@
 
 
 
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "extra": {
     "branch-alias": {
       "dev-master": "1.0-dev"
