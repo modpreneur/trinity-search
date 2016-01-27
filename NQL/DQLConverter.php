@@ -188,7 +188,7 @@ class DQLConverter
                 case WherePartType::CONDITION:
                     $whereClause .= " ".(!count($cond->key->getJoinWith()) ? ($cond->key->getAlias(
                             ) ?? $columnDefaultAlias) : $cond->key->getJoinWith()[count($cond->key->getJoinWith())-1]).".".$cond->key->getName(
-                        ).$cond->operator."?".$paramCounter;
+                        ).($cond->operator == "!=" ? "<>" : $cond->operator)."?".$paramCounter;
                     $whereParams[] = $cond->value;
                     $paramCounter++;
                     break;
