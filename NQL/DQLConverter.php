@@ -24,7 +24,6 @@ class DQLConverter
     private static $ignoredEntities = [
         'AccessLog',
         'ExceptionLog',
-        'Client',
     ];
 
     /** @var EntityManager  */
