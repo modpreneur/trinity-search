@@ -29,6 +29,7 @@ class Table
         $this->name = $name;
 
         $this->alias = is_null($alias) ? $this->getDefaultAlias() : $alias;
+        if($this->alias == "group") $this->alias = "_group";
     }
 
     /**

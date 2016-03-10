@@ -62,6 +62,9 @@ class DQLConverter
         $columnDefaultAlias = count($nqlQuery->getFrom()->getTables()) === 1 ? $nqlQuery->getFrom()->getTables(
         )[0]->getAlias() : "";
 
+        if($columnDefaultAlias == "group")
+            $columnDefaultAlias = "_group";
+
         if($skipSelection) {
             $query->select($columnDefaultAlias);
         }
