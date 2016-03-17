@@ -9,7 +9,6 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
 use Trinity\Bundle\SearchBundle\Utils\StringUtils;
 
@@ -39,11 +38,11 @@ class DQLConverter
     private $namespace;
 
 
-    public function __construct(ContainerInterface $container, EntityManager $entityManager)
+    public function __construct(EntityManager $entityManager, $doctrinePrefix, $namespace)
     {
         $this->em = $entityManager;
-        $this->doctrinePrefix = $container->getParameter('trinity.search.doctrine_prefix');
-        $this->namespace = $container->getParameter('trinity.search.namespace');
+        $this->doctrinePrefix = $doctrinePrefix;
+        $this->namespace = $namespace;
         $this->fetchAvailableEntities();
     }
 
