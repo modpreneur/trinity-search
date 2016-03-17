@@ -38,6 +38,12 @@ class DQLConverter
     private $namespace;
 
 
+    /**
+     * DQLConverter constructor.
+     * @param EntityManager $entityManager
+     * @param $doctrinePrefix
+     * @param $namespace
+     */
     public function __construct(EntityManager $entityManager, $doctrinePrefix, $namespace)
     {
         $this->em = $entityManager;
