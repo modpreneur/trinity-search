@@ -12,8 +12,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Trinity\Bundle\SearchBundle\NQL\Column;
 use Trinity\Bundle\SearchBundle\NQL\DQLConverter;
 use Trinity\Bundle\SearchBundle\NQL\NQLQuery;
+use Trinity\Bundle\SearchBundle\NQL\Select;
 use Trinity\FrameworkBundle\Utils\ObjectMixin;
-
 
 /**
  * Class Search
@@ -24,35 +24,42 @@ final class Search
     /** @var DQLConverter  */
     private $dqlConverter;
 
+    /**
+     * Search constructor.
+     * @param DQLConverter $dqlConverter
+     */
     public function __construct(DQLConverter $dqlConverter)
     {
         $this->dqlConverter = $dqlConverter;
     }
 
     /**
-     * @param $tableName
+     * @param string $tableName
      * @param $queryParams
      * @return NQLQuery
+     * @throws \Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException
      * @throws NotFoundHttpException
      */
     public function queryTable($tableName, $queryParams) : NQLQuery
     {
-        $query = "SELECT e.".$tableName." ".$queryParams;
+        $query = "SELECT e.{$tableName} {$queryParams}";
 
-        if (is_null($query)) {
+        if (null === $query) {
             throw self::createNotFoundException();
         }
 
         return $this->query($query);
     }
 
+
     /**
      * @param $queryParams
      * @return array
      * @throws NotFoundHttpException
      */
-    public function queryGlobal($queryParams) : array {
-        $results = array();
+    public function queryGlobal($queryParams) : array
+    {
+        $results = [];
 
         foreach ($this->dqlConverter->getAvailableEntities() as $entity) {
             try {
@@ -73,10 +80,10 @@ final class Search
      * @return NQLQuery
      * @throws Exception\SyntaxErrorException
      */
-    public function query($query) : NQLQuery {
+    public function query($query) : NQLQuery
+    {
         $nqlQuery = NQLQuery::parse(trim($query));
         $nqlQuery->setDqlConverter($this->dqlConverter);
-
         return $nqlQuery;
     }
 
@@ -95,8 +102,9 @@ final class Search
      * @param string $value
      * @return array|mixed|string
      */
-    public static function getValue($entity, $value) {
-        $values = explode(".", $value);
+    public static function getValue($entity, $value)
+    {
+        $values = explode('.', $value);
 
         return self::getObject($entity, $values, 0);
     }
@@ -107,38 +115,38 @@ final class Search
      * @param int $curValueIndex
      * @return array|mixed|string
      */
-    private static function getObject($entity, $values, $curValueIndex) {
+    private static function getObject($entity, $values, $curValueIndex)
+    {
         try {
             $obj = ObjectMixin::get($entity, $values[$curValueIndex]);
         } catch (\Exception $ex) {
-            $obj = "";
+            $obj = '';
         }
 
-        if ($curValueIndex == count($values) - 1) {
-            return $curValueIndex ? array($values[$curValueIndex] => $obj) : $obj;
-        } else if ($obj instanceof PersistentCollection) {
+        if ($curValueIndex === count($values) - 1) {
+            return $curValueIndex ? [$values[$curValueIndex] => $obj] : $obj;
+        } elseif ($obj instanceof PersistentCollection) {
             $items = [];
             foreach ($obj as $item) {
-                if($curValueIndex == 0) {
+                if ($curValueIndex === 0) {
                     $items[] = self::getObject($item, $values, $curValueIndex + 1);
                 } else {
                     $items[$values[$curValueIndex]][] = self::getObject($item, $values, $curValueIndex + 1);
                 }
             }
             return $items;
-        } else if (is_object($obj)) {
-            if($curValueIndex == 0) {
+        } elseif (is_object($obj)) {
+            if ($curValueIndex === 0) {
                 return self::getObject($obj, $values, $curValueIndex + 1);
             } else {
-                return array($values[$curValueIndex] => self::getObject($obj, $values, $curValueIndex + 1));
+                return [$values[$curValueIndex] => self::getObject($obj, $values, $curValueIndex + 1)];
             }
         } else {
-            if($curValueIndex == 0) {
+            if ($curValueIndex === 0) {
                 return self::getObject($obj, $values, $curValueIndex + 1);
             } else {
-                return array($values[$curValueIndex] => self::getObject($obj, $values, $curValueIndex + 1));
+                return [$values[$curValueIndex] => self::getObject($obj, $values, $curValueIndex + 1)];
             }
-
         }
 
     }
@@ -148,8 +156,10 @@ final class Search
      * @param NQLQuery $nqlQuery
      * @param bool $skipSelection
      * @return mixed|string
+     * @throws \Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException
      */
-    public function convertToJson(NQLQuery $nqlQuery, bool $skipSelection) {
+    public function convertToJson(NQLQuery $nqlQuery, bool $skipSelection)
+    {
         $entities = $nqlQuery->getQueryBuilder($skipSelection)->getQuery()->getResult();
 
         if (!$skipSelection) {
@@ -160,6 +170,7 @@ final class Search
 
         $result = [];
 
+        /** @var Select $select */
         $select = $nqlQuery->getSelect();
 
         foreach ($entities as $entity) {
@@ -176,7 +187,8 @@ final class Search
      * @param array $entities
      * @return mixed|string
      */
-    public function convertArrayToJson(array $entities) {
+    public function convertArrayToJson(array $entities)
+    {
         return SerializerBuilder::create()->setPropertyNamingStrategy(
             new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy())
         )->build()->serialize($entities, 'json');
@@ -192,12 +204,12 @@ final class Search
         $attributes = [];
         foreach ($columns as $column) {
             $fullName = $column->getFullName();
-            $value = $this->getValue($entity, $fullName);
+            $value = static::getValue($entity, $fullName);
 
             $key = count($column->getJoinWith()) ? $column->getJoinWith()[0] : $column->getName();
 
             if (array_key_exists($key, $attributes)) {
-                if(is_array($attributes[$key]) && is_array($value)) {
+                if (is_array($value) && is_array($attributes[$key])) {
                     $attributes[$key] = array_replace_recursive($attributes[$key], $value);
                 }
             } else {

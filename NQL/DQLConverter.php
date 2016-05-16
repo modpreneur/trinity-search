@@ -12,7 +12,6 @@ use Doctrine\ORM\QueryBuilder;
 use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
 use Trinity\Bundle\SearchBundle\Utils\StringUtils;
 
-
 /**
  * Class DQLConverter
  * @package Trinity\SearchBundle\NQL
@@ -55,28 +54,32 @@ class DQLConverter
 
     /**
      * @param NQLQuery $nqlQuery
+     * @param bool $skipSelection
      * @return QueryBuilder
      * @throws SyntaxErrorException
      */
-    public function convert(NQLQuery $nqlQuery, $skipSelection) : QueryBuilder
+    public function convert(NQLQuery $nqlQuery, bool $skipSelection) : QueryBuilder
     {
         $this->checkTables($nqlQuery->getFrom());
 
+        /** @var QueryBuilder $query */
         $query = $this->em->createQueryBuilder();
 
+        /** @var string $columnDefaultAlias */
         $columnDefaultAlias = count($nqlQuery->getFrom()->getTables()) === 1 ? $nqlQuery->getFrom()->getTables(
-        )[0]->getAlias() : "";
+        )[0]->getAlias() : '';
 
-        if($columnDefaultAlias == "group")
-            $columnDefaultAlias = "_group";
-
-        if($skipSelection) {
-            $query->select($columnDefaultAlias);
+        if ($columnDefaultAlias === 'group') {
+            $columnDefaultAlias = '_group';
         }
-        else {
+
+        if ($skipSelection) {
+            $query->select($columnDefaultAlias);
+        } else {
             if ($nqlQuery->getSelect()->getColumns()) {
+                /** @var Column $column */
                 foreach ($nqlQuery->getSelect()->getColumns() as $column) {
-                    $query->addSelect((($column->getAlias()) ?? $columnDefaultAlias) . '.' . $column->getName());
+                    $query->addSelect(($column->getAlias() ?? $columnDefaultAlias) . '.' . $column->getName());
                 }
             } else {
                 $query->select($columnDefaultAlias);
@@ -91,19 +94,27 @@ class DQLConverter
             $query->where($paramWhere['clause'])->setParameters($paramWhere['params']);
         }
 
-        $columns = $this->getAllColumns($skipSelection ? Select::getBlank() : $nqlQuery->getSelect(), $nqlQuery->getWhere(), $nqlQuery->getOrderBy());
+        $columns = $this->getAllColumns(
+            $skipSelection ? Select::getBlank() : $nqlQuery->getSelect(),
+            $nqlQuery->getWhere(),
+            $nqlQuery->getOrderBy()
+        );
 
         $alreadyJoined = [];
 
         foreach ($columns as $column) {
             if (count($column->getJoinWith())) {
                 $joinWith = $column->getJoinWith();
-                for($i=0;$i<count($joinWith);$i++) {
-                    if(!array_key_exists($joinWith[$i], $alreadyJoined)) {
-                        if ($i == 0) {
-                            $column = (is_null($column->getAlias()) ? $columnDefaultAlias : $column->getAlias()) . '.' . $column->getJoinWith()[$i];
+                $iMax = count($joinWith);
+                for ($i=0; $i<$iMax; $i++) {
+                    if (!array_key_exists($joinWith[$i], $alreadyJoined)) {
+                        if ($i === 0) {
+                            $column =
+                                null === $column->getAlias() ?
+                                    $columnDefaultAlias :
+                                    $column->getAlias(). '.' . $column->getJoinWith()[$i];
                         } else {
-                            $column = $joinWith[$i - 1] . "." . $joinWith[$i];
+                            $column = $joinWith[$i - 1] . '.' . $joinWith[$i];
                         }
                         $query->innerJoin($column, $joinWith[$i]);
 
@@ -113,16 +124,23 @@ class DQLConverter
             }
         }
 
-
-        foreach($nqlQuery->getOrderBy()->getColumns() as $column) {
-            $query->addOrderBy((count($column->getJoinWith()) ? $column->getJoinWith()[count($column->getJoinWith()) -1] : (is_null($column->getAlias()) ? $columnDefaultAlias : $column->getAlias())) . "." . $column->getName(), $column->getOrdering());
+        foreach ($nqlQuery->getOrderBy()->getColumns() as $column) {
+            $query->addOrderBy(
+                (
+                count($column->getJoinWith()) ?
+                    $column->getJoinWith()[count($column->getJoinWith()) -1] :
+                    null === $column->getAlias() ? $columnDefaultAlias : $column->getAlias()
+                )
+                . '.' . $column->getName(),
+                $column->getOrdering()
+            );
         }
 
-        if (!is_null($nqlQuery->getLimit())) {
+        if (!null === $nqlQuery->getLimit()) {
             $query->setMaxResults($nqlQuery->getLimit());
         }
 
-        if (!is_null($nqlQuery->getOffset())) {
+        if (!null === $nqlQuery->getOffset()) {
             $query->setFirstResult($nqlQuery->getOffset());
         }
 
@@ -140,7 +158,7 @@ class DQLConverter
 
         foreach ($tables as $table) {
             if (!in_array(strtolower($table->getName()), $this->entities)) {
-                throw new SyntaxErrorException("Unknown table \"".$table->getName()."\"");
+                throw new SyntaxErrorException("Unknown table \"{$table->getName()}\"");
             }
         }
     }
@@ -148,17 +166,15 @@ class DQLConverter
 
     private function fetchAvailableEntities()
     {
-        $this->entities = array();
+        $this->entities = [];
         $meta = $this->em->getMetadataFactory()->getAllMetadata();
 
         /* @var $m ClassMetadata */
         foreach ($meta as $m) {
             $entityName = substr(strrchr($m->getName(), "\\"), 1);
 
-            if (StringUtils::startsWith($m->getName(), $this->namespace) && !in_array(
-                    $entityName,
-                    self::$ignoredEntities
-                )
+            if (!in_array($entityName, self::$ignoredEntities) &&
+                StringUtils::startsWith($m->getName(), $this->namespace)
             ) {
                 $this->entities[] = strtolower($entityName);
             }
@@ -182,20 +198,25 @@ class DQLConverter
      * @return array
      */
 
-    private function getParametrizedWhere($conditions, $columnDefaultAlias = "", &$paramCounter = 0) : array
+    private function getParametrizedWhere($conditions, $columnDefaultAlias = '', &$paramCounter = 0) : array
     {
-        $whereClause = "";
-        $whereParams = array();
+        $whereClause = '';
+        $whereParams = [];
 
         foreach ($conditions as $cond) {
             switch ($cond->type) {
                 case WherePartType::OPERATOR:
-                    $whereClause .= " ".$cond->value;
+                    $whereClause .= ' '.$cond->value;
                     break;
                 case WherePartType::CONDITION:
-                    $whereClause .= " ".(!count($cond->key->getJoinWith()) ? ($cond->key->getAlias(
-                            ) ?? $columnDefaultAlias) : $cond->key->getJoinWith()[count($cond->key->getJoinWith())-1]).".".$cond->key->getName(
-                        ).($cond->operator == "!=" ? "<>" : $cond->operator)."?".$paramCounter;
+                    $whereClause .=
+                        ' '.(!count($cond->key->getJoinWith()) ?
+                            ($cond->key->getAlias() ?? $columnDefaultAlias) :
+                            $cond->key->getJoinWith()[count($cond->key->getJoinWith())-1]).
+                            '.'.$cond->key->getName().
+                            ($cond->operator === '!=' ?'<>' : $cond->operator).
+                            '?'.$paramCounter
+                    ;
                     $whereParams[] = $cond->value;
                     $paramCounter++;
                     break;
@@ -208,13 +229,13 @@ class DQLConverter
                     $subWhereClause = $parametrizedSubWhere['clause'];
                     $subWhereParams = $parametrizedSubWhere['params'];
 
-                    $whereClause .= " (".$subWhereClause.")";
+                    $whereClause .= ' ('.$subWhereClause.')';
                     $whereParams = array_merge($whereParams, $subWhereParams);
                     break;
             }
         }
 
-        return array("clause" => $whereClause, "params" => $whereParams);
+        return ['clause' => $whereClause, 'params' => $whereParams];
     }
 
 
@@ -226,7 +247,7 @@ class DQLConverter
      */
     private function getAllColumns(Select $select, Where $where, OrderBy $orderBy) : array
     {
-        $columns = array();
+        $columns = [];
 
         foreach ($select->getColumns() as $column) {
             $columns[$column->getFullName()] = $column;
@@ -235,7 +256,7 @@ class DQLConverter
         foreach ($whereColumns as $column) {
             $columns[$column->getFullName()] = $column;
         }
-        foreach($orderBy->getColumns() as $column) {
+        foreach ($orderBy->getColumns() as $column) {
             $columns[$column->getFullName()] = $column;
         }
 
@@ -249,16 +270,15 @@ class DQLConverter
      */
     private function getAllColumnsFromWhere($conditions) : array
     {
-        $columns = array();
+        $columns = [];
 
         /** @var WherePart $cond */
         foreach ($conditions as $cond) {
             if ($cond->type === WherePartType::CONDITION) {
                 $columns[] = $cond->key;
             } else {
-                if ($cond->type == WherePartType::SUBCONDITION) {
+                if ($cond->type === WherePartType::SUBCONDITION) {
                     $subColumns = $this->getAllColumnsFromWhere($cond->subTree);
-
                     foreach ($subColumns as $subColumn) {
                         $columns[] = $subColumn;
                     }

@@ -16,9 +16,12 @@ use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
 class Select
 {
     /** @var Column[]  */
-    private $columns = array();
+    private $columns = [];
 
 
+    /**
+     * Select constructor.
+     */
     private function __construct()
     {
     }
@@ -30,11 +33,11 @@ class Select
      * @return Select
      * @throws SyntaxErrorException
      */
-    public static function parse($str = "") : Select
+    public static function parse($str = '') : Select
     {
         $selection = new Select();
 
-        $columns = preg_split("/,/", $str);
+        $columns = preg_split('/,/', $str);
 
         foreach ($columns as &$column) {
             $column = Column::parse($column);

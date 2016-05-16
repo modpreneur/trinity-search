@@ -29,10 +29,9 @@ class Operator
      */
     public function __construct($operator = null)
     {
-        if ($operator == null) {
+        $this->value = $operator;
+        if ($operator === null) {
             $this->value = self::EQ;
-        } else {
-            $this->value = $operator;
         }
     }
 

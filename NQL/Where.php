@@ -5,10 +5,8 @@
 
 namespace Trinity\Bundle\SearchBundle\NQL;
 
-
 use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
 use Trinity\Bundle\SearchBundle\Utils\StringUtils;
-
 
 /**
  * Class Where
@@ -25,9 +23,12 @@ class Where
     /**
      * @var WherePart[]
      */
-    private $conditions = array();
+    private $conditions = [];
 
 
+    /**
+     * Where constructor.
+     */
     private function __construct()
     {
     }
@@ -38,8 +39,9 @@ class Where
      *
      * @param $str
      * @return Where
+     * @throws \Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException
      */
-    public static function parse($str = "") : Where
+    public static function parse($str = '') : Where
     {
         $condition = new Where();
         $condition->setConditions(self::parseCondition($str));
@@ -66,17 +68,16 @@ class Where
      */
     private static function parseCondition($str) : array
     {
-        $parts = array();
+        $parts = [];
 
         // REMOVE TRAILING SPACES
         $str = trim($str);
 
         // LOOP THROUGH ALL CHARACTERS
-        for ($i = 0; $i < strlen($str); $i++) {
-
+        $iMax = strlen($str);
+        for ($i = 0; $i < $iMax; $i++) {
             // IF CHARACTER IS LEFT BRACKET, FIND PAIR BRACKET AND RECURSIVELY FIND CONDITIONS WITHIN THESE BRACKETS
-            if ($str[$i] === "(") {
-
+            if ($str[$i] === '(') {
                 $pairBracketIndex = self::findPairBracketIndex($str, $i + 1);
 
                 if ($pairBracketIndex > 0) {
@@ -92,19 +93,19 @@ class Where
                     $i = $pairBracketIndex;
                     continue;
                 } else {
-                    throw new SyntaxErrorException("Missing pair bracket");
+                    throw new SyntaxErrorException('Missing pair bracket');
                 }
 
             } // IF THERE IS SPACE - IT IS SIGN THAT THERE WILL BE "AND" OR "OR" CONDITION
             else {
-                if ($str[$i] === " ") {
+                if ($str[$i] === ' ') {
                     if (trim(substr($str, $i, 4)) === Operator:: AND) {
                         $part = new WherePart();
                         $part->type = WherePartType::OPERATOR;
                         $part->value = Operator:: AND;
 
                         $parts[] = $part;
-                        $i = $i + 3;
+                        $i += 3;
                     } else {
                         if (trim(substr($str, $i, 3)) === Operator:: OR) {
                             $part = new WherePart();
@@ -112,12 +113,12 @@ class Where
                             $part->value = Operator:: OR;
 
                             $parts[] = $part;
-                            $i = $i + 2;
+                            $i += 2;
                         }
                     }
                 } // OTHERWISE WE EXPECTING KEY=VALUE
                 else {
-                    $match = array();
+                    $match = [];
                     $wasFound = preg_match(self::$regKeyOpValue, substr($str, $i), $match);
 
                     if ($wasFound) {
@@ -125,8 +126,9 @@ class Where
                         $part->type = WherePartType::CONDITION;
                         $part->key = Column::parse($match['key']);
                         $value = $match['value'];
-                        if(StringUtils::startsWith($value,'"') && StringUtils::endsWith($value, '"'))
+                        if (StringUtils::startsWith($value, '"') && StringUtils::endsWith($value, '"')) {
                             $value = StringUtils::substring($value, 1, StringUtils::length($value) - 1);
+                        }
                         $part->value = $value;
                         $part->operator = $match['operator'];
 
@@ -134,7 +136,7 @@ class Where
                         $i = $i + strlen($match[0]) - 1;
                     } else {
                         $part = new WherePartType();
-                        $part->type = "UNKNOWN";
+                        $part->type = 'UNKNOWN';
                         $part->value = $str[$i];
 
                         $parts[] = $part;
@@ -142,7 +144,7 @@ class Where
                         $context = self::getErrorContext($str, $i);
 
                         throw new SyntaxErrorException(
-                            "Unrecognized char sequence at '".$context['subString']."' starting from index ".$context['errorAt']
+                            "Unrecognized char sequence at '{$context['subString']}' starting from index {$context['errorAt']}"
                         );
                     }
 
@@ -157,19 +159,20 @@ class Where
     /**
      * Finds index of pair bracket. Returns  positive number (index) if bracket found, otherwise returns -1
      *
-     * @param $str
-     * @param $start
+     * @param string $str
+     * @param int $start
      * @return int
      */
     private static function findPairBracketIndex($str, $start = 1) : int
     {
         $level = 1;
 
-        for ($i = $start; $i < strlen($str); $i++) {
-            if ($str[$i] === "(") {
+        $iMax = strlen($str);
+        for ($i = $start; $i < $iMax; $i++) {
+            if ($str[$i] === '(') {
                 $level++;
             } else {
-                if ($str[$i] === ")") {
+                if ($str[$i] === ')') {
                     $level--;
                     if ($level === 0) {
                         return $i;
@@ -183,8 +186,8 @@ class Where
 
 
     /**
-     * @param $str
-     * @param $index
+     * @param string $str
+     * @param int $index
      * @return array
      */
     private static function getErrorContext($str, $index) : array
@@ -192,7 +195,7 @@ class Where
         $length = 16;
         $start = $index >= $length / 2 ? $index - $length / 2 : 0;
 
-        return array("subString" => substr($str, $start, $length), "errorAt" => $index - $start);
+        return ['subString' => substr($str, $start, $length), 'errorAt' => $index - $start];
     }
 
 

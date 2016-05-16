@@ -8,7 +8,6 @@ namespace Trinity\Bundle\SearchBundle\DataFixtures\ORM;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
-
 /**
  * Class LoadData
  * @package Trinity\Bundle\SearchBundle\DataFixtures\ORM

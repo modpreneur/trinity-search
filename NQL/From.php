@@ -8,7 +8,6 @@ namespace Trinity\Bundle\SearchBundle\NQL;
 use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
 use Trinity\Bundle\SearchBundle\Utils\StringUtils;
 
-
 /**
  * Class From
  * @package Trinity\SearchBundle\NQL
@@ -38,18 +37,19 @@ class From
     {
         $from = new From();
 
-        $tableStrings = StringUtils::trimStringArray(preg_split("/,/", $str));
+        $tableStrings = StringUtils::trimStringArray(preg_split('/,/', $str));
 
         $tables = [];
 
         foreach ($tableStrings as $tableStr) {
-
-            $match = array();
+            $match = [];
             $wasFound = preg_match(self::$regFromTable, $tableStr, $match);
 
             if ($wasFound) {
                 $tables[] = new Table(
-                    $match['prefix'], $match['name'], array_key_exists('alias', $match) ? $match['alias'] : null
+                    $match['prefix'],
+                    $match['name'],
+                    array_key_exists('alias', $match) ? $match['alias'] : null
                 );
             } else {
                 throw new SyntaxErrorException("Invalid column \"$tableStr\"");

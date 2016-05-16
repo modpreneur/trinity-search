@@ -5,31 +5,35 @@
 
 namespace Trinity\Bundle\SearchBundle\NQL;
 
-
 /**
  * Class Table
  * @package Trinity\Bundle\SearchBundle\NQL
  */
 class Table
 {
+    /** @var string $name */
     private $name;
+    /** @var string $prefix */
     private $prefix;
+    /** @var string $alias */
     private $alias;
 
 
     /**
      * Table constructor.
-     * @param $prefix
-     * @param $name
-     * @param null $alias
+     * @param string $prefix
+     * @param string $name
+     * @param null | string $alias
      */
-    function __construct($prefix, $name, $alias = null)
+    public function __construct($prefix, $name, $alias = null)
     {
         $this->prefix = $prefix;
         $this->name = $name;
 
-        $this->alias = is_null($alias) ? $this->getDefaultAlias() : $alias;
-        if($this->alias == "group") $this->alias = "_group";
+        $this->alias = null === $alias ? $this->getDefaultAlias() : $alias;
+        if ($this->alias === 'group') {
+            $this->alias = '_group';
+        }
     }
 
     /**

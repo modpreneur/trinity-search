@@ -5,7 +5,6 @@
 
 namespace Trinity\Bundle\SearchBundle\NQL;
 
-
 /**
  * Class WherePart
  * @package Trinity\Bundle\SearchBundle\NQL

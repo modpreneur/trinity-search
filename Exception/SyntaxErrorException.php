@@ -14,7 +14,12 @@ use Exception;
  */
 class SyntaxErrorException extends Exception
 {
-    public function __construct($message = "") {
+    /**
+     * SyntaxErrorException constructor.
+     * @param string $message
+     */
+    public function __construct($message = '')
+    {
         $this->message = 'Syntax error: ' . $message;
     }
 }

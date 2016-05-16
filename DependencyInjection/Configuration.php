@@ -17,6 +17,7 @@ class Configuration implements ConfigurationInterface
 {
     /**
      * {@inheritdoc}
+     * @throws \RuntimeException
      */
     public function getConfigTreeBuilder()
     {

@@ -8,7 +8,6 @@ namespace Trinity\Bundle\SearchBundle\NQL;
 use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
 use Trinity\Bundle\SearchBundle\Utils\StringUtils;
 
-
 /**
  * Class Column
  * @package Trinity\Bundle\SearchBundle\NQL
@@ -30,7 +29,7 @@ class Column
      * @param null $wrappingFunction
      * @param null $joinWith
      */
-    function __construct($name, $alias = null, $wrappingFunction = null, $joinWith = null)
+    public function __construct($name, $alias = null, $wrappingFunction = null, $joinWith = null)
     {
         $this->name = $name;
         $this->wrappingFunction = StringUtils::isEmpty($wrappingFunction) ? null : $wrappingFunction;
@@ -77,7 +76,7 @@ class Column
     /**
      * @param string|null $alias
      */
-    function setAlias($alias)
+    public function setAlias($alias)
     {
         $this->alias = $alias;
     }
@@ -86,7 +85,7 @@ class Column
     /**
      * @param string[]|null $joinWith
      */
-    function setJoinWith($joinWith)
+    public function setJoinWith($joinWith)
     {
         $this->joinWith = $joinWith;
     }
@@ -95,20 +94,20 @@ class Column
     /**
      * @return string
      */
-    function getFullName() : string
+    public function getFullName() : string
     {
         $fullName = $this->getName();
         $joinCount = count($this->joinWith);
-        if($joinCount) {
-            if($joinCount > 1) {
-                $fullName = implode('.', $this->joinWith) . "." . $fullName;
+        if ($joinCount) {
+            if ($joinCount > 1) {
+                $fullName = implode('.', $this->joinWith) . '.' . $fullName;
             } else {
-
-                $fullName = $this->joinWith[0] . "." . $fullName;
+                $fullName = $this->joinWith[0] . '.' . $fullName;
             }
         }
-        if(!is_null($this->alias))
-            $fullName = $this->alias . "." . $fullName;
+        if (null !== $this->alias) {
+            $fullName = $this->alias . '.' . $fullName;
+        }
         return $fullName;
     }
 
@@ -121,16 +120,18 @@ class Column
      */
     public static function parse($str, $alias = null)
     {
-        $match = array();
+        $match = [];
         $column = trim($str);
         $wasFound = preg_match(self::$regFuncColumn, $column, $match);
 
         if ($wasFound) {
             $name = $match['column'];
-            $alias = is_null($alias) ? $match['alias'] : $alias;
+            $alias = null === $alias ? $match['alias'] : $alias;
             $function = $match['function'];
-            $joinWith = is_null($alias) ? $match['alias'] : StringUtils::isEmpty($match['joinWith']) ? [] : explode(":",$match['joinWith']);
-
+            $joinWith =
+                null === $alias ?
+                    $match['alias'] :
+                    StringUtils::isEmpty($match['joinWith']) ? [] : explode(':',$match['joinWith']);
             return new Column($name, $alias, $function, $joinWith);
         } else {
             throw new SyntaxErrorException("Invalid column name '$column'");

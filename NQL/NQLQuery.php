@@ -7,7 +7,6 @@ namespace Trinity\Bundle\SearchBundle\NQL;
 
 use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
 
-
 /**
  * Class NQLQuery
  * @package Trinity\SearchBundle\NQL
@@ -29,6 +28,9 @@ class NQLQuery
     private $dqlConverter;
 
 
+    /**
+     * NQLQuery constructor.
+     */
     private function __construct()
     {
     }
@@ -41,9 +43,10 @@ class NQLQuery
      */
     public static function parse($str) : NQLQuery
     {
+        /** @var NQLQuery $query */
         $query = new NQLQuery();
 
-        $match = array();
+        $match = [];
 
         $wasFound = preg_match(self::$regSearchQuery, $str, $match);
 
@@ -76,7 +79,7 @@ class NQLQuery
                 $query->orderBy = OrderBy::getBlank();
             }
         } else {
-            throw new SyntaxErrorException("Incorrect query");
+            throw new SyntaxErrorException('Incorrect query');
         }
 
         //dump($query);
@@ -134,7 +137,8 @@ class NQLQuery
     /**
      * @return OrderBy
      */
-    public function getOrderBy() {
+    public function getOrderBy()
+    {
         return $this->orderBy;
     }
 
@@ -142,16 +146,22 @@ class NQLQuery
     /**
      * @param bool $skipSelection
      * @return \Doctrine\ORM\QueryBuilder|null
+     * @throws \Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException
      */
-    public function getQueryBuilder($skipSelection = false) {
-        if(!is_null($this->dqlConverter)) {
+    public function getQueryBuilder($skipSelection = false)
+    {
+        if (null !== $this->dqlConverter) {
             return $this->dqlConverter->convert($this, $skipSelection);
         } else {
             return null;
         }
     }
 
-    function setDqlConverter(DQLConverter $converter) {
+    /**
+     * @param DQLConverter $converter
+     */
+    public function setDqlConverter(DQLConverter $converter)
+    {
         $this->dqlConverter = $converter;
     }
 }

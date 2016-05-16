@@ -5,7 +5,6 @@
 
 namespace Trinity\Bundle\SearchBundle\Utils;
 
-
 /**
  * Class StringUtils
  * @package Trinity\Bundle\SearchBundle\Utils
@@ -37,6 +36,12 @@ final class StringUtils
     }
 
 
+    /**
+     * @param string $str
+     * @param int $start
+     * @param null|int $end
+     * @return string
+     */
     public static function substring($str, $start, $end = null) : string
     {
         if ((0 > $start) && (0 < $end)) {
@@ -45,32 +50,41 @@ final class StringUtils
         if (null === $end) {
             $end = self::length($str);
         }
-
         return \substr($str, $start, $end - $start);
     }
 
 
+    /**
+     * @param string $str
+     * @param string $prefix
+     * @return bool
+     */
     public static function startsWith($str, $prefix) : bool
     {
-        return ((null === $str) && (null === $prefix)) ? true : self::substring(
-                $str,
-                0,
-                self::length($prefix)
-            ) === $prefix;
+        return ((null === $str) && (null === $prefix)) ?
+            true :
+            self::substring($str, 0, self::length($prefix)) === $prefix;
     }
 
 
-    public static function endsWith($str, $suffix)
+    /**
+     * @param string $str
+     * @param string $suffix
+     * @return bool
+     */
+    public static function endsWith($str, $suffix) : bool
     {
         return ((null === $str) && (null === $suffix))
             ? true
-            : self::substring(
-                $str,
-                self::length($str) - self::length($suffix)
-            ) === $suffix;
+            : self::substring($str, self::length($str) - self::length($suffix)) === $suffix;
     }
 
 
+    /**
+     * @param string $str
+     * @param string $remove
+     * @return string
+     */
     public static function removeStart($str, $remove)
     {
         if ((true === self::isEmpty($str)) || (true === self::isEmpty($remove))) {
@@ -84,6 +98,12 @@ final class StringUtils
     }
 
 
+    /**
+     * @param string $str
+     * @param string $search
+     * @param int $startPos
+     * @return bool|int
+     */
     public static function indexOf($str, $search, $startPos = 0)
     {
         $result = self::validateIndexOf($str, $search, $startPos);
@@ -99,6 +119,12 @@ final class StringUtils
     }
 
 
+    /**
+     * @param string $str
+     * @param string $search
+     * @param int $startPos
+     * @return bool|int
+     */
     private static function validateIndexOf($str, $search, &$startPos)
     {
         if ((null === $str) || (null === $search)) {

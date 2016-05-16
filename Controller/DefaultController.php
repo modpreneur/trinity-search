@@ -11,16 +11,12 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\View;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcher;
-use JMS\Serializer\Naming\SerializedNameAnnotationStrategy;
-use JMS\Serializer\SerializerBuilder;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Trinity\Bundle\SearchBundle\NQL\Column;
-use Trinity\Bundle\SearchBundle\PassThroughNamingStrategy;
+use Trinity\Bundle\SearchBundle\NQL\NQLQuery;
 use Trinity\Bundle\SearchBundle\Search;
 use Trinity\Bundle\SearchBundle\Utils\StringUtils;
-
 
 /**
  * @Route("/search")
@@ -33,30 +29,41 @@ class DefaultController extends FOSRestController
      * @QueryParam(name="q", nullable=false, strict=true, description="DB Query", allowBlank=true)
      *
      * @param ParamFetcher $paramFetcher
-     *
      * @param string $tableName
+     *
      * @return JsonResponse
+     *
+     * @throws \Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws \InvalidArgumentException
      * @throws \Exception
+     *
      * @View
      */
     public function tableAction(ParamFetcher $paramFetcher, $tableName)
     {
         $queryParams = $paramFetcher->get('q');
+
+        /** @var Search $search */
         $search = $this->get('trinity.search');
 
-        if ($tableName === "global") {
-            if(StringUtils::isEmpty($queryParams)) {
-                throw new \Exception("Query is empty");
+        if ($tableName === 'global') {
+            if (StringUtils::isEmpty($queryParams)) {
+                throw new \InvalidArgumentException('Query is empty');
             }
-            return new Response($search->convertArrayToJson($search->queryGlobal($queryParams)), 200, ['Content-Type' => 'application/json']);
+            return new Response(
+                $search->convertArrayToJson($search->queryGlobal($queryParams)),
+                200,
+                ['Content-Type' => 'application/json']
+            );
         } else {
+            /** @var NQLQuery $nqlQuery */
             $nqlQuery = $search->queryTable($tableName, $queryParams);
             return new Response(
-               $search->convertToJson($nqlQuery, count($nqlQuery->getSelect()->getColumns())) , 200, ['Content-Type' => 'application/json']
+                $search->convertToJson($nqlQuery, count($nqlQuery->getSelect()->getColumns())),
+                200,
+                ['Content-Type' => 'application/json']
             );
         }
     }
-
-
-
 }

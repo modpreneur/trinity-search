@@ -2,10 +2,12 @@
 
 namespace Trinity\Bundle\SearchBundle;
 
-
 use JMS\Serializer\Metadata\PropertyMetadata;
 use JMS\Serializer\Naming\PropertyNamingStrategyInterface;
 
+/**
+ * {@inheritDoc}
+ */
 class PassThroughNamingStrategy implements PropertyNamingStrategyInterface
 {
     /**
