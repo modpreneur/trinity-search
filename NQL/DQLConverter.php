@@ -136,11 +136,11 @@ class DQLConverter
             );
         }
 
-        if (!null === $nqlQuery->getLimit()) {
+        if (null !== $nqlQuery->getLimit()) {
             $query->setMaxResults($nqlQuery->getLimit());
         }
 
-        if (!null === $nqlQuery->getOffset()) {
+        if (null !== $nqlQuery->getOffset()) {
             $query->setFirstResult($nqlQuery->getOffset());
         }
 
