@@ -45,6 +45,8 @@ framework:
     router: { resource: "%kernel.root_dir%/config/routing.yml" }
     templating:
             engines: ['twig']
+    form: ~
+
 
 
 # Twig Configuration
@@ -52,8 +54,52 @@ twig:
     debug:            "%kernel.debug%"
     strict_variables: "%kernel.debug%"
 
-fos_rest:
-    param_fetcher_listener: true
+trinity_settings:
+  settings:
 
+
+trinity_logger:
+  elastic_logs:
+    elastic_host: 'necktie_elasticsearch_1'
+
+
+swiftmailer:
+    transport: "%mailer_transport%"
+    username:  "noreply"
+    host:      "%mailer_host%"
+    port:      "%mailer_port%"
+    spool:     { type: memory }
+
+
+security:
+  providers:
+      fos_userbundle:
+          id: fos_user.user_provider.username
+
+      in_memory:
+          memory:
+              users:
+                  ryan:
+                      password: ryanpass
+                      roles: 'ROLE_ADMIN'
+
+  role_hierarchy:
+      ROLE_ADMIN:       ROLE_USER
+      ROLE_SUPER_ADMIN: ROLE_ADMIN
+
+  firewalls:
+     # disables authentication for assets and the profiler, adapt it according to your needs
+      dev:
+          pattern:  ^/(_(profiler|wdt)|css|images|js)/
+          security: false
+      default:
+          pattern: ^/
+          anonymous: ~
+
+
+fos_user:
+    db_driver: orm # other valid values are 'mongodb', 'couchdb' and 'propel'
+    firewall_name: main
+    user_class: Trinity\Bundle\SearchBundle\Tests\Functional\Entity\User
 
 services:
