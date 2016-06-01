@@ -109,10 +109,7 @@ class DQLConverter
                 for ($i=0; $i<$iMax; $i++) {
                     if (!array_key_exists($joinWith[$i], $alreadyJoined)) {
                         if ($i === 0) {
-                            $column =
-                                null === $column->getAlias() ?
-                                    $columnDefaultAlias :
-                                    $column->getAlias(). '.' . $column->getJoinWith()[$i];
+                            $column = ($column->getAlias() === null ? $columnDefaultAlias : $column->getAlias()) . '.' . $column->getJoinWith()[$i];
                         } else {
                             $column = $joinWith[$i - 1] . '.' . $joinWith[$i];
                         }
