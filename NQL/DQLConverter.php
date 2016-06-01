@@ -126,7 +126,7 @@ class DQLConverter
                 (
                 count($column->getJoinWith()) ?
                     $column->getJoinWith()[count($column->getJoinWith()) -1] :
-                    null === $column->getAlias() ? $columnDefaultAlias : $column->getAlias()
+                    ($column->getAlias() === null ? $columnDefaultAlias : $column->getAlias())
                 )
                 . '.' . $column->getName(),
                 $column->getOrdering()
