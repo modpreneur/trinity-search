@@ -19,6 +19,7 @@ class Operator
     const GT = '>';
     const LTET = '<=';
     const GTET = '>=';
+    const LIKE = 'LIKE';
 
     private $value;
 

@@ -210,11 +210,15 @@ class DQLConverter
                         ' '.(!count($cond->key->getJoinWith()) ?
                             ($cond->key->getAlias() ?? $columnDefaultAlias) :
                             $cond->key->getJoinWith()[count($cond->key->getJoinWith())-1]).
-                            '.'.$cond->key->getName().
-                            ($cond->operator === '!=' ?'<>' : $cond->operator).
-                            '?'.$paramCounter
+                        '.'.$cond->key->getName().' '.
+                        ($cond->operator === '!=' ?'<>' : $cond->operator).
+                        ' ?'.$paramCounter
                     ;
-                    $whereParams[] = $cond->value;
+                    if($cond->operator === Operator::LIKE && !StringUtils::startsWith($cond->value, '%') && !StringUtils::endsWith($cond->value, '%')) {
+                        $whereParams[] = '%' . $cond->value . '%';
+                    } else {
+                        $whereParams[] = $cond->value;
+                    }
                     $paramCounter++;
                     break;
                 case WherePartType::SUBCONDITION:

@@ -18,7 +18,7 @@ class Where
      * Regular expression to get key=value from condition
      * @var string
      */
-    private static $regKeyOpValue = '/^(?<key>[^\s(<>=!]+)\s*(?<operator>[<>!]?=|[<>])\s*(?<value>\"[^\.")]+\"|[^\s)]+)/';
+    private static $regKeyOpValue = '/^(?<key>[^\s(<>=!]+)\s*(?<operator>(([<>!]?=|[<>]))|(LIKE))\s*(?<value>\"[^\.")]+\"|[^\s)]+)/';
 
     /**
      * @var WherePart[]
