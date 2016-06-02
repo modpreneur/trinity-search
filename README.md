@@ -1,5 +1,10 @@
 #Trinity Search
 
+
+[![Coverage Status](https://coveralls.io/repos/github/modpreneur/trinity-search/badge.svg?branch=master)](https://coveralls.io/github/modpreneur/trinity-widgets?branch=master)
+[![Build Status](https://travis-ci.org/modpreneur/trinity-search.svg?branch=master)](https://travis-ci.org/modpreneur/trinity-settings)
+
+
 Trinity search is part of Trinity package.
 
 Description:
