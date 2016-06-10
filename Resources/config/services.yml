@@ -1,9 +1,12 @@
 services:
 
+    trinity.search.detail_url_provider:
+        class: Trinity\Bundle\SearchBundle\DetailUrlProvider
+        arguments: ["@router"]
+
     trinity.search:
         class: Trinity\Bundle\SearchBundle\Search
-        arguments: ["@trinity.search.dql_converter"]
-
+        arguments: ["@doctrine.orm.entity_manager", "@trinity.search.dql_converter", "%trinity.search.namespace%", "@service_container", "%trinity.search.detail_url_provider%"]
 
     trinity.search.dql_converter:
         class: Trinity\Bundle\SearchBundle\NQL\DQLConverter

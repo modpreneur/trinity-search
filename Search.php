@@ -5,14 +5,25 @@
 
 namespace Trinity\Bundle\SearchBundle;
 
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\PersistentCollection;
 use JMS\Serializer\Naming\SerializedNameAnnotationStrategy;
+use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Validator\Constraints\Choice;
 use Trinity\Bundle\SearchBundle\NQL\Column;
 use Trinity\Bundle\SearchBundle\NQL\DQLConverter;
 use Trinity\Bundle\SearchBundle\NQL\NQLQuery;
 use Trinity\Bundle\SearchBundle\NQL\Select;
+use Trinity\Bundle\SearchBundle\Serialization\ObjectNormalizer;
+use Trinity\Bundle\SearchBundle\Utils\StringUtils;
 use Trinity\FrameworkBundle\Utils\ObjectMixin;
 
 /**
@@ -24,13 +35,32 @@ final class Search
     /** @var DQLConverter  */
     private $dqlConverter;
 
+    /** @var EntityManager */
+    private $em;
+
+    /** @var string */
+    private $namespace;
+
+    /** @var DetailUrlProvider */
+    private $detailUrlProvider;
+
     /**
-     * Search constructor.
+     * Search constructor.p
+     * @param EntityManager $em
      * @param DQLConverter $dqlConverter
+     * @param $namespace
+     * @param ContainerInterface $container
+     * @param $detailUrlProviderServiceName
+     * @internal param $detailUrlProvider
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      */
-    public function __construct(DQLConverter $dqlConverter)
+    public function __construct(EntityManager $em, DQLConverter $dqlConverter, $namespace, ContainerInterface $container, $detailUrlProviderServiceName)
     {
         $this->dqlConverter = $dqlConverter;
+        $this->em = $em;
+        $this->namespace = $namespace;
+        $this->detailUrlProvider = $container->get($detailUrlProviderServiceName);
     }
 
     /**
@@ -53,22 +83,49 @@ final class Search
 
 
     /**
-     * @param $queryParams
+     * @param $str
+     * @param bool $addDetailUrls
      * @return array
-     * @throws NotFoundHttpException
      */
-    public function queryGlobal($queryParams) : array
+    public function queryGlobal($str, $addDetailUrls = true) : array
     {
         $results = [];
 
         foreach ($this->dqlConverter->getAvailableEntities() as $entity) {
             try {
-                $result = $this->queryTable($entity, $queryParams)->getQueryBuilder()->getQuery()->getResult();
+                $columns = $this->getEntityStringColumns($entity);
 
-                if (count($result)) {
-                    $results[$entity] = $result;
+                if(count($columns)) {
+                    $query = '{';
+
+                    $count = count($columns);
+
+                    foreach($columns as $i=>$column) {
+                        $query .= $column . ' LIKE "%' . $str . '%"';
+                        if ($i + 1 < $count) {
+                            $query .= ' OR ';
+                        }
+                    }
+
+                    $query .= '} LIMIT=10';
+
+                    $result = $this->queryTable($entity, $query)->getQueryBuilder()->getQuery()->getResult();
+
+                    if (count($result)) {
+                        $results[$entity] = $result;
+                    }
                 }
             } catch (\Exception $e) {
+                dump($e);
+                die();
+            }
+        }
+
+        if($addDetailUrls) {
+            foreach($results as &$result) {
+                foreach($result as &$item) {
+                    $item->{'_detail'} = $this->detailUrlProvider->getUrl($item);
+                }
             }
         }
 
@@ -97,6 +154,7 @@ final class Search
         return new NotFoundHttpException($message, $previous);
     }
 
+    /** @noinspection GenericObjectTypeUsageInspection */
     /**
      * @param object $entity
      * @param string $value
@@ -109,6 +167,7 @@ final class Search
         return self::getObject($entity, $values, 0);
     }
 
+    /** @noinspection GenericObjectTypeUsageInspection */
     /**
      * @param object $entity
      * @param string[] $values
@@ -177,9 +236,11 @@ final class Search
             $result[] = $this->select($select->getColumns(), $entity);
         }
 
+        $context = new SerializationContext();
+        $context->setSerializeNull(true);
         return SerializerBuilder::create()->setPropertyNamingStrategy(
             new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy())
-        )->build()->serialize($result, 'json');
+        )->build()->serialize($result, 'json', $context);
     }
 
 
@@ -189,11 +250,16 @@ final class Search
      */
     public function convertArrayToJson(array $entities)
     {
-        return SerializerBuilder::create()->setPropertyNamingStrategy(
-            new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy())
-        )->build()->serialize($entities, 'json');
+        $encoders = [new JsonEncoder()];
+        $objNormalizer = new ObjectNormalizer();
+        $objNormalizer->setCircularReferenceLimit(0);
+        $objNormalizer->setCircularReferenceHandler(function() { return ''; });
+        $normalizers = [$objNormalizer];
+
+        return (new Serializer($normalizers, $encoders))->serialize($entities,'json');
     }
 
+    /** @noinspection GenericObjectTypeUsageInspection */
     /**
      * @param  Column[] $columns
      * @param  object $entity
@@ -210,6 +276,7 @@ final class Search
 
             if (array_key_exists($key, $attributes)) {
                 if (is_array($value) && is_array($attributes[$key])) {
+                    /** @noinspection SlowArrayOperationsInLoopInspection */
                     $attributes[$key] = array_replace_recursive($attributes[$key], $value);
                 }
             } else {
@@ -218,5 +285,77 @@ final class Search
         }
 
         return $attributes;
+    }
+
+
+    /**
+     * @param $entityName
+     * @return array Entity class name, null if not found
+     * @throws \Doctrine\ORM\ORMException
+     * @internal param string $table Table name
+     * @internal param EntityManager $em Entity manager
+     */
+    protected function getEntityStringColumns($entityName)
+    {
+        // Go through all the classes
+        $classNames = $this->em->getConfiguration()->getMetadataDriverImpl()->getAllClassNames();
+
+        $annotationReader = new AnnotationReader();
+
+        foreach($classNames as $i=>$className) {
+            $className = $classNames[$i];
+            $classMetaData = $this->em->getClassMetadata($className);
+
+            if (StringUtils::startsWith($className, $this->namespace)) {
+                $currentEntityName = strtolower($classMetaData->getReflectionClass()->getShortName());
+                $searchingEntityName = strtolower($entityName);
+                if ($currentEntityName === $searchingEntityName) {
+                    $allColumnNames = $classMetaData->getFieldNames();
+                    $columnNames = [];
+
+                    foreach ($allColumnNames as $columnName) {
+                        try {
+                            $annotations = $annotationReader->getPropertyAnnotations(new \ReflectionProperty($classMetaData->getName(), $columnName));
+
+                            if ($classMetaData->getTypeOfField($columnName) === 'string') {
+                                $isEnum = false;
+
+                                foreach ($annotations as $annotation) {
+                                    if ($annotation instanceof Choice) {
+                                        $isEnum = true;
+                                        break;
+                                    }
+                                }
+                                if (!$isEnum) {
+
+                                    $columnNames[] = $columnName;
+                                }
+                            }
+                        } catch (\Exception $e) {
+                            dump($e);
+                            die();
+                        }
+                    }
+
+                    return $columnNames;
+                }
+            }
+        }
+        return [];
+    }
+
+    /**
+     * @param \ReflectionClass $reflectionClass
+     * @return \ReflectionProperty[]
+     */
+    private function getClassProperties($reflectionClass) {
+        if($reflectionClass === null || !$reflectionClass) {
+            return [];
+        }
+
+        $thisClassProperties = $reflectionClass->getProperties();
+        $parentClassProperties = $this->getClassProperties($reflectionClass->getParentClass());
+
+        return array_merge($thisClassProperties, $parentClassProperties);
     }
 }

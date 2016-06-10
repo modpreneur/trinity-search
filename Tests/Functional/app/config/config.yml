@@ -17,6 +17,7 @@ parameters:
     locale: en
     trinity.search.doctrine_prefix: "Search"
     trinity.search.namespace: "Trinity\\Bundle\\SearchBundle\\Tests\\Functional\\Entity"
+    trinity.search.detail_url_provider: "trinity.search.detail_url_provider"
 
 # Doctrine Configuration
 doctrine:
