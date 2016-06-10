@@ -56,7 +56,7 @@ class AppKernel extends Kernel
             new \JMS\SerializerBundle\JMSSerializerBundle(),
 
             new \Trinity\Bundle\LoggerBundle\LoggerBundle(),
-            new \Trinity\FrameworkBundle\TrinityFrameworkBundle(),
+            //new \Trinity\FrameworkBundle\TrinityFrameworkBundle(),
             new \Trinity\Bundle\SearchBundle\SearchBundle(),
             new \Trinity\Bundle\SettingsBundle\SettingsBundle(),
         );

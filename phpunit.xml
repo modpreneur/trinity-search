@@ -18,13 +18,6 @@
         <server name="KERNEL_DIR" value="Tests/app"/>
     </php>
 
-    <logging>
-        <log type="coverage-html" target="build/coverage" title="Trinity" charset="UTF-8" yui="true" highlight="true"
-             lowUpperBound="35" highLowerBound="70"/>
-        <log type="coverage-clover" target="./build/logs/clover.xml"/>
-        <log type="junit" target="./build/logs/junit.xml" logIncompleteSkipped="false"/>
-    </logging>
-
     <testsuites>
         <testsuite name="Search Test Suite">
             <directory>./Tests</directory>
@@ -32,10 +25,11 @@
     </testsuites>
 
     <filter>
-        <whitelist>
-            <directory>SearchBundle</directory>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory>./</directory>
             <exclude>
-                <directory suffix=".php">./Tests</directory>
+                <directory>Tests/</directory>
+                <directory>vendor/</directory>
             </exclude>
         </whitelist>
     </filter>

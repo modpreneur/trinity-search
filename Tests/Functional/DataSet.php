@@ -5,7 +5,6 @@
 
 namespace Trinity\Bundle\SearchBundle\Tests\Functional;
 
-
 use Doctrine\ORM\EntityManager;
 use Faker\Factory;
 use Trinity\Bundle\SearchBundle\Tests\Functional\Entity\Address;
@@ -13,7 +12,6 @@ use Trinity\Bundle\SearchBundle\Tests\Functional\Entity\UserGroup;
 use Trinity\Bundle\SearchBundle\Tests\Functional\Entity\Product;
 use Trinity\Bundle\SearchBundle\Tests\Functional\Entity\Shipping;
 use Trinity\Bundle\SearchBundle\Tests\Functional\Entity\User;
-
 
 /**
  * Class DataSet

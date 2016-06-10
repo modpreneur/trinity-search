@@ -5,9 +5,7 @@
 
 namespace Trinity\Bundle\SearchBundle\Tests\Functional;
 
-
 use Trinity\Bundle\SearchBundle\Tests\Functional\Entity\Product;
-
 
 /**
  * Class ProductTest

@@ -7,6 +7,7 @@
 namespace Trinity\Bundle\SearchBundle\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Trinity\Bundle\SearchBundle\Tests\Functional\app\AppKernel;
 
 
 /**
@@ -15,12 +16,9 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  */
 class TestCase extends WebTestCase
 {
-
     protected static function getKernelClass()
     {
-        require_once __DIR__.'/Functional/app/AppKernel.php';
-
-        return 'Trinity\Bundle\SearchBundle\Tests\Functional\app\AppKernel';
+        return AppKernel::class;
     }
 
 }
