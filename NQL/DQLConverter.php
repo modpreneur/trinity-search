@@ -51,6 +51,17 @@ class DQLConverter
         $this->fetchAvailableEntities();
     }
 
+    /**
+     * @param $entityName
+     * @return QueryBuilder
+     */
+    public function count($entityName) : QueryBuilder {
+        $query = $this->em->createQueryBuilder();
+        $query->select('COUNT(jao37qbe)');
+        $query->from($this->doctrinePrefix.':'.$entityName, 'jao37qbe');
+
+        return $query;
+    }
 
     /**
      * @param NQLQuery $nqlQuery
