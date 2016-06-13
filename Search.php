@@ -14,8 +14,6 @@ use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Constraints\Choice;
 use Trinity\Bundle\SearchBundle\NQL\Column;
@@ -24,7 +22,7 @@ use Trinity\Bundle\SearchBundle\NQL\NQLQuery;
 use Trinity\Bundle\SearchBundle\NQL\Select;
 use Trinity\Bundle\SearchBundle\Serialization\ObjectNormalizer;
 use Trinity\Bundle\SearchBundle\Utils\StringUtils;
-use Trinity\FrameworkBundle\Utils\ObjectMixin;
+use Trinity\Bundle\UtilsBundle\Utils\ObjectMixin;
 
 /**
  * Class Search
@@ -116,7 +114,7 @@ final class Search
                     }
                 }
             } catch (\Exception $e) {
-                dump($e);
+                dump($e); // @todo - @martinMatejka
                 die();
             }
         }

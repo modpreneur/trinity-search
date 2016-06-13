@@ -51,14 +51,12 @@ class AppKernel extends Kernel
             new \Symfony\Bundle\SecurityBundle\SecurityBundle(),
             new \Symfony\Bundle\TwigBundle\TwigBundle(),
             new \Sensio\Bundle\GeneratorBundle\SensioGeneratorBundle(),
-            //new \FOS\RestBundle\FOSRestBundle(),
             new \FOS\UserBundle\FOSUserBundle(),
             new \JMS\SerializerBundle\JMSSerializerBundle(),
 
-            new \Trinity\Bundle\LoggerBundle\LoggerBundle(),
-            //new \Trinity\FrameworkBundle\TrinityFrameworkBundle(),
             new \Trinity\Bundle\SearchBundle\SearchBundle(),
             new \Trinity\Bundle\SettingsBundle\SettingsBundle(),
+            new \Trinity\Bundle\UtilsBundle\UtilsBundle(),
         );
     }
 
