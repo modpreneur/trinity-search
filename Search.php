@@ -215,20 +215,16 @@ final class Search
      * @param NQLQuery $nqlQuery
      * @param bool $skipSelection
      * @return mixed|string
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     * @throws \Doctrine\ORM\NoResultException
      * @throws \Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException
      */
     public function convertToJson(NQLQuery $nqlQuery, bool $skipSelection)
     {
         $entities = $nqlQuery->getQueryBuilder($skipSelection)->getQuery()->getResult();
 
-        $totalCount = $this->dqlConverter->count($nqlQuery->getFrom()->getTables()[0]->getName())->getQuery()->getSingleScalarResult();
-
         if (!$skipSelection) {
             return SerializerBuilder::create()->setPropertyNamingStrategy(
                 new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy())
-            )->build()->serialize(['count' => ['result' => count($entities), 'total' => $totalCount], 'result' => $entities], 'json');
+            )->build()->serialize($entities, 'json');
         }
 
         $result = [];
@@ -244,7 +240,7 @@ final class Search
         $context->setSerializeNull(true);
         return SerializerBuilder::create()->setPropertyNamingStrategy(
             new SerializedNameAnnotationStrategy(new PassThroughNamingStrategy())
-        )->build()->serialize(['count' => ['result' => count($result), 'total' => $totalCount], 'result' => $result], 'json', $context);
+        )->build()->serialize($result, 'json', $context);
     }
 
 
