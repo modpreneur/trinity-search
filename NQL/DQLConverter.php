@@ -161,6 +161,8 @@ class DQLConverter
                 $query->resetDQLPart('select');
                 $query->select('COUNT(' . $selectPart . ')');
                 $query->resetDQLPart('orderBy');
+                $query->setMaxResults(null);
+                $query->setFirstResult(null);
             }
         }
 
