@@ -52,18 +52,6 @@ class DQLConverter
     }
 
     /**
-     * @param $entityName
-     * @return QueryBuilder
-     */
-    public function count($entityName) : QueryBuilder {
-        $query = $this->em->createQueryBuilder();
-        $query->select('COUNT(jao37qbe)');
-        $query->from($this->doctrinePrefix.':'.$entityName, 'jao37qbe');
-
-        return $query;
-    }
-
-    /**
      * @param NQLQuery $nqlQuery
      * @param bool $skipSelection
      * @return QueryBuilder
@@ -96,6 +84,7 @@ class DQLConverter
                 $query->select($columnDefaultAlias);
             }
         }
+
         foreach ($nqlQuery->getFrom()->getTables() as $table) {
             $query->from($this->doctrinePrefix.':'.$table->getName(), $table->getAlias());
         }
@@ -151,10 +140,31 @@ class DQLConverter
         if (null !== $nqlQuery->getOffset()) {
             $query->setFirstResult($nqlQuery->getOffset());
         }
-
+        
         return $query;
     }
 
+    /**
+     * @param QueryBuilder $query
+     * @return QueryBuilder
+     */
+    public function convertToCount(QueryBuilder $query) {
+        $selects = $query->getDQLPart('select');
+
+        if(count($selects) === 1) {
+            /** @var Query\Expr\Select $select */
+            $select = $selects[0];
+
+            $selectParts = $select->getParts();
+            if(count($selectParts) === 1) {
+                $selectPart = $selectParts[0];
+                $query->resetDQLPart('select');
+                $query->select('COUNT(' . $selectPart . ')');
+            }
+        }
+
+        return $query;
+    }
 
     /**
      * @param From $from
