@@ -2083,12 +2083,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/modpreneur/trinity-settings.git",
-                "reference": "90f336076736a6c07aeb56e925caebcf5629ccfd"
+                "reference": "db99ad418b9e17c68385c522b29e03c50e387c4d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/modpreneur/trinity-settings/zipball/90f336076736a6c07aeb56e925caebcf5629ccfd",
-                "reference": "90f336076736a6c07aeb56e925caebcf5629ccfd",
+                "url": "https://api.github.com/repos/modpreneur/trinity-settings/zipball/db99ad418b9e17c68385c522b29e03c50e387c4d",
+                "reference": "db99ad418b9e17c68385c522b29e03c50e387c4d",
                 "shasum": ""
             },
             "require": {
@@ -2137,7 +2137,7 @@
                 }
             ],
             "description": "Trinity Settings bundle",
-            "time": "2016-06-03 08:06:01"
+            "time": "2016-06-15 09:04:54"
         },
         {
             "name": "trinity/utils",
