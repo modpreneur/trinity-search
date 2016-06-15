@@ -5,8 +5,8 @@
   "license": "MIT",
   "authors": [
     {
-      "name": "Trinity Team",
-      "email": "info@modpreneur.com"
+      "name": "Martin Matejka",
+      "email": "matejka@webvalley.cz"
     }
   ],
 
@@ -14,20 +14,17 @@
     "php": ">=7",
     "symfony/framework-bundle": "~2.8 | ~3.0",
     "symfony/symfony": "~3.0",
-    "nette/utils": "~2.3",
     "friendsofsymfony/rest-bundle": "~1.7",
     "sensio/framework-extra-bundle": "~3.0",
     "jms/serializer-bundle": "~1.1",
-    "friendsofsymfony/user-bundle": "master-dev",
     "doctrine/doctrine-bundle" : "~1",
     "knplabs/doctrine-behaviors": "~1",
+    "doctrine/orm": "~2.5",
 
-    "trinity/settings": "dev-master",
     "trinity/utils": "dev-master"
   },
 
   "require-dev": {
-    "symfony/swiftmailer-bundle": "~2.3",
     "sensio/generator-bundle": "~3.0",
     "phpunit/phpunit": "5.1.*",
     "mockery/mockery": "~0.9",

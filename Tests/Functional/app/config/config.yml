@@ -58,23 +58,8 @@ twig:
 fos_rest:
     param_fetcher_listener: true
 
-trinity_settings:
-  settings:
-
-
-swiftmailer:
-    transport: "%mailer_transport%"
-    username:  "noreply"
-    host:      "%mailer_host%"
-    port:      "%mailer_port%"
-    spool:     { type: memory }
-
-
 security:
   providers:
-      fos_userbundle:
-          id: fos_user.user_provider.username
-
       in_memory:
           memory:
               users:
@@ -94,11 +79,5 @@ security:
       default:
           pattern: ^/
           anonymous: ~
-
-
-fos_user:
-    db_driver: orm # other valid values are 'mongodb', 'couchdb' and 'propel'
-    firewall_name: main
-    user_class: Trinity\Bundle\SearchBundle\Tests\Functional\Entity\User
 
 services:
