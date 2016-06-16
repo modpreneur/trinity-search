@@ -192,13 +192,13 @@ class DQLConverter
 
         /* @var $m ClassMetadata */
         foreach ($meta as $m) {
-            $entityName = substr(strrchr($m->getName(), "\\"), 1);
+            $entityName = strtolower(substr(strrchr($m->getName(), "\\"), 1));
 
             if (!array_key_exists($entityName, $this->entities) ||
                 (!in_array($entityName, self::$ignoredEntities, true) &&
-                StringUtils::startsWith($m->getName(), $this->namespace))
+                    StringUtils::startsWith($m->getName(), $this->namespace))
             ) {
-                $this->entities[strtolower($entityName)] = $m->getName();
+                $this->entities[$entityName] = $m->getName();
             }
         }
     }
