@@ -86,7 +86,7 @@ class DQLConverter
         }
 
         foreach ($nqlQuery->getFrom()->getTables() as $table) {
-            $query->from($this->entities[$table->getName()], $table->getAlias());
+            $query->from($this->entities[strtolower($table->getName())], $table->getAlias());
         }
 
         if ($nqlQuery->getWhere()->getConditions()) {
