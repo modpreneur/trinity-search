@@ -86,7 +86,7 @@ class DQLConverter
         }
 
         foreach ($nqlQuery->getFrom()->getTables() as $table) {
-            $query->from($this->doctrinePrefix.':'.$table->getName(), $table->getAlias());
+            $query->from($this->entities[$table->getName()], $table->getAlias());
         }
 
         if ($nqlQuery->getWhere()->getConditions()) {
@@ -178,7 +178,7 @@ class DQLConverter
         $tables = $from->getTables();
 
         foreach ($tables as $table) {
-            if (!in_array(strtolower($table->getName()), $this->entities)) {
+            if (!array_key_exists(strtolower($table->getName()), $this->entities)) {
                 throw new SyntaxErrorException("Unknown table \"{$table->getName()}\"");
             }
         }
@@ -194,10 +194,11 @@ class DQLConverter
         foreach ($meta as $m) {
             $entityName = substr(strrchr($m->getName(), "\\"), 1);
 
-            if (!in_array($entityName, self::$ignoredEntities) &&
-                StringUtils::startsWith($m->getName(), $this->namespace)
+            if (!array_key_exists($entityName, $this->entities) ||
+                (!in_array($entityName, self::$ignoredEntities, true) &&
+                StringUtils::startsWith($m->getName(), $this->namespace))
             ) {
-                $this->entities[] = strtolower($entityName);
+                $this->entities[strtolower($entityName)] = $m->getName();
             }
         }
     }
