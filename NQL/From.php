@@ -37,7 +37,7 @@ class From
     {
         $from = new From();
 
-        $tableStrings = StringUtils::trimStringArray(preg_split('/,/', $str));
+        $tableStrings = StringUtils::trimStringArray(explode(',', $str));
 
         $tables = [];
 

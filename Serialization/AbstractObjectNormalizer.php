@@ -25,14 +25,26 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     const DEPTH_KEY_PATTERN = 'depth_%s::%s';
 
     private $propertyTypeExtractor;
-    private $attributesCache = array();
+    private $attributesCache = [];
 
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null)
-    {
+
+    /**
+     * AbstractObjectNormalizer constructor.
+     *
+     * @param ClassMetadataFactoryInterface|null $classMetadataFactory
+     * @param NameConverterInterface|null $nameConverter
+     * @param PropertyTypeExtractorInterface|null $propertyTypeExtractor
+     */
+    public function __construct(
+        ClassMetadataFactoryInterface $classMetadataFactory = null,
+        NameConverterInterface $nameConverter = null,
+        PropertyTypeExtractorInterface $propertyTypeExtractor = null
+    ) {
         parent::__construct($classMetadataFactory, $nameConverter);
 
         $this->propertyTypeExtractor = $propertyTypeExtractor;
     }
+
 
     /**
      * {@inheritdoc}
@@ -42,12 +54,14 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         return is_object($data) && !$data instanceof \Traversable;
     }
 
+
     /**
      * {@inheritdoc}
      *
      * @throws CircularReferenceException
+     * @throws \Symfony\Component\Serializer\Exception\LogicException
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, $format = null, array $context = [])
     {
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->getCacheKey($context);
@@ -57,8 +71,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return $this->handleCircularReference($object);
         }
 
-        $data = array();
-        $stack = array();
+        $data = [];
+        $stack = [];
         $attributes = $this->getAttributes($object, $format, $context);
         $class = get_class($object);
 
@@ -82,15 +96,26 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         foreach ($stack as $attribute => $attributeValue) {
             if (!$this->serializer instanceof NormalizerInterface) {
-                throw new LogicException(sprintf('Cannot normalize attribute "%s" because the injected serializer is not a normalizer', $attribute));
+                throw new LogicException(
+                    sprintf(
+                        'Cannot normalize attribute "%s" because the injected serializer is not a normalizer',
+                        $attribute
+                    )
+                );
             }
 
-            $data = $this->updateData($data, $attribute, $this->serializer->normalize($attributeValue, $format, $context));
+            $data = $this->updateData(
+                $data,
+                $attribute,
+                $this->serializer->normalize($attributeValue, $format, $context)
+            );
         }
 
         return $data;
     }
 
+
+    //@todo @MartinMatejka Arguments with default values must be at the end
     /**
      * Gets and caches attributes for the given object, format and context.
      *
@@ -126,6 +151,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         return $this->attributesCache[$class] = $this->extractAttributes($object, $format, $context);
     }
 
+
     /**
      * Extracts attributes to normalize from the class of the given object, format and context.
      *
@@ -135,7 +161,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @return string[]
      */
-    abstract protected function extractAttributes($object, $format = null, array $context = array());
+    abstract protected function extractAttributes($object, $format = null, array $context = []);
+
 
     /**
      * Gets the attribute value.
@@ -147,7 +174,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @return mixed
      */
-    abstract protected function getAttributeValue($object, $attribute, $format = null, array $context = array());
+    abstract protected function getAttributeValue($object, $attribute, $format = null, array $context = []);
+
 
     /**
      * {@inheritdoc}
@@ -159,8 +187,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     /**
      * {@inheritdoc}
+     * @throws \Symfony\Component\Serializer\Exception\RuntimeException
+     * @throws \Symfony\Component\Serializer\Exception\LogicException
+     * @throws \Symfony\Component\Serializer\Exception\UnexpectedValueException
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($data, $class, $format = null, array $context = [])
     {
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->getCacheKey($context);
@@ -176,7 +207,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $attribute = $this->nameConverter->denormalize($attribute);
             }
 
-            if (($allowedAttributes !== false && !in_array($attribute, $allowedAttributes)) || !$this->isAllowedAttribute($class, $attribute, $format, $context)) {
+            if (($allowedAttributes !== false && !in_array($attribute, $allowedAttributes, true))
+                || !$this->isAllowedAttribute($class, $attribute, $format, $context)
+            ) {
                 continue;
             }
 
@@ -191,6 +224,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         return $object;
     }
 
+
     /**
      * Sets attribute value.
      *
@@ -201,6 +235,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * @param array       $context
      */
     abstract protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array());
+
 
     /**
      * Should this attribute be normalized?
@@ -215,6 +250,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     {
         return !in_array($attributeName, $this->ignoredAttributes) && !$this->isMaxDepthReached(get_class($object), $attributeName, $context);
     }
+
 
     /**
      * Validates the submitted data and denormalizes it.
@@ -232,14 +268,16 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     private function validateAndDenormalize($currentClass, $attribute, $data, $format, array $context)
     {
-        if (null === $this->propertyTypeExtractor || null === $types = $this->propertyTypeExtractor->getTypes($currentClass, $attribute)){
+        if (null === $this->propertyTypeExtractor
+            || null === $types = $this->propertyTypeExtractor->getTypes($currentClass, $attribute)
+        ) {
             return $data;
         }
 
-        $expectedTypes = array();
+        $expectedTypes = [];
         foreach ($types as $type) {
             if (null === $data && $type->isNullable()) {
-                return;
+                return null;
             }
 
             $builtinType = $type->getBuiltinType();
@@ -248,7 +286,13 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             if (Type::BUILTIN_TYPE_OBJECT === $builtinType) {
                 if (!$this->serializer instanceof DenormalizerInterface) {
-                    throw new LogicException(sprintf('Cannot denormalize attribute "%s" for class "%s" because injected serializer is not a denormalizer', $attribute, $class));
+                    throw new LogicException(
+                        sprintf(
+                            'Cannot denormalize attribute "%s" for class "%s" because injected serializer is not a denormalizer',
+                            $attribute,
+                            $class
+                        )
+                    );
                 }
 
                 if ($this->serializer->supportsDenormalization($data, $class, $format)) {
@@ -261,8 +305,17 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
         }
 
-        throw new UnexpectedValueException(sprintf('The type of the "%s" attribute for class "%s" must be one of "%s" ("%s" given).', $attribute, $currentClass, implode('", "', array_keys($expectedTypes)), gettype($data)));
+        throw new UnexpectedValueException(
+            sprintf(
+                'The type of the "%s" attribute for class "%s" must be one of "%s" ("%s" given).',
+                $attribute,
+                $currentClass,
+                implode('", "', array_keys($expectedTypes)),
+                gettype($data)
+            )
+        );
     }
+
 
     /**
      * Sets an attribute and apply the name converter if necessary.
@@ -289,9 +342,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @param string $class
      * @param string $attribute
-     * @param array  $context
+     * @param array $context
      *
      * @return bool
+     * @throws \Symfony\Component\Serializer\Exception\InvalidArgumentException
      */
     private function isMaxDepthReached($class, $attribute, array &$context)
     {
@@ -327,6 +381,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         return false;
     }
 
+    
     /**
      * Gets the cache key to use.
      *

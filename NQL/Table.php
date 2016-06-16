@@ -70,5 +70,4 @@ class Table
     {
         return $this->alias;
     }
-
 }

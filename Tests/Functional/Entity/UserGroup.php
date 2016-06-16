@@ -2,11 +2,8 @@
 
 namespace Trinity\Bundle\SearchBundle\Tests\Functional\Entity;
 
-
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Knp\DoctrineBehaviors\Model as ORMBehaviors;
-
 
 /**
  * Class Group
@@ -42,9 +39,11 @@ class UserGroup
      */
     private $users;
 
-
-
-    public function __construct() {
+    /**
+     * UserGroup constructor.
+     */
+    public function __construct()
+    {
         $this->users = new ArrayCollection();
     }
 
@@ -98,10 +97,9 @@ class UserGroup
      * @param User $user
      * @return $this
      */
-    public function addUser(User $user){
+    public function addUser(User $user)
+    {
         $this->users->add($user);
-
         return $this;
     }
-
 }

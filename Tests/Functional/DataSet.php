@@ -19,10 +19,13 @@ use Trinity\Bundle\SearchBundle\Tests\Functional\Entity\User;
  */
 class DataSet
 {
+    /**
+     * @param EntityManager $entityManager
+     */
+    public function load(EntityManager $entityManager)
+    {
 
-    public function load(EntityManager $entityManager){
-
-        $faker = Factory::create();;
+        $faker = Factory::create();
 
         $groups  = [];
         $addresses = [];
@@ -32,25 +35,24 @@ class DataSet
         $g = 5;
         $p = 10;
 
-        for($i = 0; $i < $g; $i++) {
+        for ($i = 0; $i < $g; $i++) {
             $groups[] = $group = new UserGroup();
             $group->setName($faker->name);
-
             $entityManager->persist($group);
         }
 
 
-        for($i = 0; $i < $a; $i++) {
+        for ($i = 0; $i < $a; $i++) {
             $addresses[] = $address = new Address;
             $address->setCity($faker->city);
             $address->setStreetNumber($faker->numberBetween(1, 100));
-
             $entityManager->persist($address);
         }
+
         $entityManager->flush();
 
 
-        for($i = 0; $i < $u; $i++) {
+        for ($i = 0; $i < $u; $i++) {
             $user = new User();
 
             $user->setFirstName($faker->firstName);
@@ -63,16 +65,17 @@ class DataSet
             $user->setAddress($addresses[$faker->numberBetween(0, 9)]);
 
             $count = $faker->numberBetween(0, $g);
-            for($j = 0; $j < $count; $j++) {
+            for ($j = 0; $j < $count; $j++) {
                 $groups[$j]->addUser($user);
-                $user->addGroup( $groups[$j] );
+                $user->addGroup($groups[$j]);
             }
 
             $entityManager->persist($user);
         }
+
         $entityManager->flush();
 
-        for($i = 0; $i < $p; $i++){
+        for ($i = 0; $i < $p; $i++) {
             $product = new Product();
             $product->setName($faker->name);
             $entityManager->persist($product);
@@ -90,5 +93,4 @@ class DataSet
 
         $entityManager->flush();
     }
-
 }

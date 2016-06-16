@@ -9,7 +9,6 @@ namespace Trinity\Bundle\SearchBundle\Tests;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Trinity\Bundle\SearchBundle\Tests\Functional\app\AppKernel;
 
-
 /**
  * Class TestCase
  * @package Trinity\Bundle\SearchBundle\Tests
@@ -20,5 +19,4 @@ class TestCase extends WebTestCase
     {
         return AppKernel::class;
     }
-
 }

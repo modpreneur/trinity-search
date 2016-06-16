@@ -1,11 +1,8 @@
 <?php
 
-
 namespace Trinity\Bundle\SearchBundle\Tests\Functional\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Knp\DoctrineBehaviors\Model as ORMBehaviors;
-
 
 /**
  * Class Shipping
@@ -84,5 +81,4 @@ class Shipping
     {
         $this->product = $product;
     }
-
 }

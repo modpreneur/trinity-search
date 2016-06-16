@@ -7,7 +7,6 @@ namespace Trinity\Bundle\SearchBundle\Exception;
 
 use Exception;
 
-
 /**
  * Class SyntaxErrorException
  * @package Trinity\Bundle\SearchBundle\Exception

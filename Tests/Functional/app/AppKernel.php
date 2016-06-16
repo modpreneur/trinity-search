@@ -25,12 +25,17 @@ while ($dir !== $lastDir) {
 }
 
 
-\Doctrine\Common\Annotations\AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
+\Doctrine\Common\Annotations\AnnotationRegistry::registerLoader([$loader, 'loadClass']);
 
+use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use FOS\RestBundle\FOSRestBundle;
+use JMS\SerializerBundle\JMSSerializerBundle;
+use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
+use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\Kernel;
-
+use Trinity\Bundle\SearchBundle\SearchBundle;
 
 /**
  * Class AppKernel.
@@ -43,19 +48,16 @@ class AppKernel extends Kernel
      */
     public function registerBundles()
     {
-        return array(
-            new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
-            new \Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
-            new \Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle(),
-            new \Symfony\Bundle\SecurityBundle\SecurityBundle(),
-            new \Symfony\Bundle\TwigBundle\TwigBundle(),
-            new \Sensio\Bundle\GeneratorBundle\SensioGeneratorBundle(),
-            new \FOS\RestBundle\FOSRestBundle(),
-            new \JMS\SerializerBundle\JMSSerializerBundle(),
+        return [
+            new FrameworkBundle(),
+            new DoctrineBundle(),
+            new SecurityBundle(),
+            new TwigBundle(),
+            new FOSRestBundle(),
+            new JMSSerializerBundle(),
 
-            new \Trinity\Bundle\SearchBundle\SearchBundle(),
-            new \Trinity\Bundle\UtilsBundle\UtilsBundle(),
-        );
+            new SearchBundle()
+        ];
     }
 
 

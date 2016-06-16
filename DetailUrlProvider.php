@@ -1,6 +1,7 @@
 <?php
 
 namespace Trinity\Bundle\SearchBundle;
+
 use Symfony\Component\Routing\Router;
 
 /**
@@ -26,14 +27,16 @@ class DetailUrlProvider
      * @param object $entity
      * @return string
      */
-    public function getUrl(/** @noinspection PhpUnusedParameterInspection */ $entity) {
+    public function getUrl(/** @noinspection PhpUnusedParameterInspection */ $entity)
+    {
         return null;
     }
 
     /**
      * @return Router
      */
-    protected function getRouter() {
+    protected function getRouter()
+    {
         return $this->router;
     }
 }

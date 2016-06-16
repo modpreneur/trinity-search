@@ -1,6 +1,7 @@
 <?php
 
 namespace Trinity\Bundle\SearchBundle\Serialization;
+
 use Doctrine\Common\Collections\Selectable;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -28,8 +29,12 @@ class ObjectNormalizer extends AbstractObjectNormalizer
      * @param PropertyAccessorInterface|null $propertyAccessor
      * @param PropertyTypeExtractorInterface|null $propertyTypeExtractor
      */
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null)
-    {
+    public function __construct(
+        ClassMetadataFactoryInterface $classMetadataFactory = null,
+        NameConverterInterface $nameConverter = null,
+        PropertyAccessorInterface $propertyAccessor = null,
+        PropertyTypeExtractorInterface $propertyTypeExtractor = null
+    ) {
         parent::__construct($classMetadataFactory, $nameConverter, $propertyTypeExtractor);
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
@@ -45,8 +50,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         // methods
         $reflClass = new \ReflectionClass($object);
         foreach ($reflClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflMethod) {
-            if (
-                $reflMethod->getNumberOfRequiredParameters() !== 0 ||
+            if ($reflMethod->getNumberOfRequiredParameters() !== 0 ||
                 $reflMethod->isStatic() ||
                 $reflMethod->isConstructor() ||
                 $reflMethod->isDestructor()
@@ -77,7 +81,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         $attributes = array_keys($attributes);
 
         $objVars = get_object_vars($object);
-        foreach($objVars as $key=>$value) {
+        foreach ($objVars as $key => $value) {
             $attributes[] = $key;
         }
         return $attributes;
@@ -96,18 +100,19 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             $property = $reflectionObject->getProperty($attribute);
             $property->setAccessible(true);
             $value = $property->getValue($object);
-        } catch(\Exception $e) {}
+        } catch (\Exception $e) {
+            // @todo @MartinMatejka what here?
+        }
 
-        if($value === null) {
+        if ($value === null) {
             return null;
         } else {
-            if(is_array($value)) {
+            if (is_array($value)) {
                 return [];
-            }
-            else if(is_object($value)) {
-                if($value instanceof \DateTime) {
+            } elseif (is_object($value)) {
+                if ($value instanceof \DateTime) {
                     $value = $value->format('c');
-                } else if($value instanceof Selectable) {
+                } elseif ($value instanceof Selectable) {
                     $value = [];
                 } else {
                     $value = null;

@@ -5,6 +5,7 @@
 
 namespace Trinity\Bundle\SearchBundle\Tests\Functional;
 
+use Doctrine\ORM\EntityManager;
 use JMS\Serializer\Naming\SerializedNameAnnotationStrategy;
 use JMS\Serializer\SerializerBuilder;
 use Symfony\Bundle\FrameworkBundle\Console\Application as App;
@@ -14,7 +15,6 @@ use Trinity\Bundle\SearchBundle\PassThroughNamingStrategy;
 use Trinity\Bundle\SearchBundle\Search;
 use Trinity\Bundle\SearchBundle\Tests\TestCase;
 use Trinity\Bundle\SearchBundle\Utils\StringUtils;
-
 
 /**
  * Class WebTestCase
@@ -37,13 +37,13 @@ class WebTestCase extends TestCase
     {
 
         if (self::$isInit === false) {
-
             exec('php bin/console.php doctrine:database:drop --force');
             exec('php bin/console.php doctrine:schema:create');
             exec('php bin/console.php doctrine:schema:update');
 
-            $kernel = $this->createClient()->getKernel();
+            $kernel = static::createClient()->getKernel();
             $container = $kernel->getContainer();
+            /** @var EntityManager $em */
             $em = $container->get('doctrine.orm.default_entity_manager');
 
             $data = new DataSet();
@@ -53,7 +53,9 @@ class WebTestCase extends TestCase
         self::$isInit = true;
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     public function setUp()
     {
         parent::setUp();
@@ -96,7 +98,7 @@ class WebTestCase extends TestCase
      */
     protected function get($serviceName)
     {
-        $kernel = $this->createClient()->getKernel();
+        $kernel = static::createClient()->getKernel();
         $container = $kernel->getContainer();
 
         return $container->get($serviceName);
@@ -107,15 +109,16 @@ class WebTestCase extends TestCase
      * @param string $tableName
      * @param string $queryParams
      * @return Response
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
-    protected function table($tableName, $queryParams = "")
+    protected function table($tableName, $queryParams = '')
     {
+        /** @var Search $search */
         $search = $this->get('trinity.search');
 
-        if ($tableName === "global") {
-            if(StringUtils::isEmpty($queryParams)) {
-                throw new \Exception("Query is empty");
+        if ($tableName === 'global') {
+            if (StringUtils::isEmpty($queryParams)) {
+                throw new \InvalidArgumentException('Query is empty');
             }
             return $search->convertArrayToJson($search->queryGlobal($queryParams));
         } else {
@@ -139,5 +142,4 @@ class WebTestCase extends TestCase
 
         return $json;
     }
-
 }

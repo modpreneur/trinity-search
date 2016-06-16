@@ -2,9 +2,12 @@
 
 namespace Trinity\Bundle\SearchBundle\NQL;
 
-
 use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
 
+/**
+ * Class OrderBy
+ * @package Trinity\Bundle\SearchBundle\NQL
+ */
 class OrderBy
 {
     /** @var OrderingColumn[] */
@@ -55,7 +58,7 @@ class OrderBy
         foreach ($exploded as $item) {
             $item = trim($item);
             $args = explode(' ', $item);
-            if (count($args) != 2) {
+            if (count($args) !== 2) {
                 throw new SyntaxErrorException('Error in order by part');
             }
 

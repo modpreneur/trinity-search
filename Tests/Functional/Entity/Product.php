@@ -123,5 +123,4 @@ class Product
     {
         $this->updatedAt = $updatedAt;
     }
-
 }

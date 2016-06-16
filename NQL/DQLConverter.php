@@ -51,6 +51,7 @@ class DQLConverter
         $this->fetchAvailableEntities();
     }
 
+
     /**
      * @param NQLQuery $nqlQuery
      * @param bool $skipSelection
@@ -121,6 +122,7 @@ class DQLConverter
             }
         }
 
+        /** @var OrderingColumn $column */
         foreach ($nqlQuery->getOrderBy()->getColumns() as $column) {
             $query->addOrderBy(
                 (
@@ -144,19 +146,21 @@ class DQLConverter
         return $query;
     }
 
+
     /**
      * @param QueryBuilder $query
      * @return QueryBuilder
      */
-    public function convertToCount(QueryBuilder $query) {
+    public function convertToCount(QueryBuilder $query)
+    {
         $selects = $query->getDQLPart('select');
 
-        if(count($selects) === 1) {
+        if (count($selects) === 1) {
             /** @var Query\Expr\Select $select */
             $select = $selects[0];
 
             $selectParts = $select->getParts();
-            if(count($selectParts) === 1) {
+            if (count($selectParts) === 1) {
                 $selectPart = $selectParts[0];
                 $query->resetDQLPart('select');
                 $query->select('COUNT(' . $selectPart . ')');
@@ -168,6 +172,7 @@ class DQLConverter
 
         return $query;
     }
+
 
     /**
      * @param From $from
@@ -219,7 +224,6 @@ class DQLConverter
      * @param int $paramCounter
      * @return array
      */
-
     private function getParametrizedWhere($conditions, $columnDefaultAlias = '', &$paramCounter = 0) : array
     {
         $whereClause = '';

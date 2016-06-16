@@ -7,7 +7,6 @@ namespace Trinity\Bundle\SearchBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-
 /**
  * Class SearchBundle
  * @package Trinity\Bundle\SearchBundle

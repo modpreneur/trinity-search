@@ -79,5 +79,3 @@ security:
       default:
           pattern: ^/
           anonymous: ~
-
-services:

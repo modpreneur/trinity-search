@@ -217,5 +217,4 @@ class Where
     {
         return $this->conditions;
     }
-
 }

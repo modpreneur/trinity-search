@@ -22,7 +22,7 @@ use Trinity\Bundle\SearchBundle\NQL\NQLQuery;
 use Trinity\Bundle\SearchBundle\NQL\Select;
 use Trinity\Bundle\SearchBundle\Serialization\ObjectNormalizer;
 use Trinity\Bundle\SearchBundle\Utils\StringUtils;
-use Trinity\Bundle\UtilsBundle\Utils\ObjectMixin;
+use Trinity\Component\Utils\Utils\ObjectMixin;
 
 /**
  * Class Search
@@ -46,15 +46,20 @@ final class Search
      * Search constructor.p
      * @param EntityManager $em
      * @param DQLConverter $dqlConverter
-     * @param $namespace
+     * @param string $namespace
      * @param ContainerInterface $container
-     * @param $detailUrlProviderServiceName
+     * @param string $detailUrlProviderServiceName
      * @internal param $detailUrlProvider
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      */
-    public function __construct(EntityManager $em, DQLConverter $dqlConverter, $namespace, ContainerInterface $container, $detailUrlProviderServiceName)
-    {
+    public function __construct(
+        EntityManager $em,
+        DQLConverter $dqlConverter,
+        $namespace,
+        ContainerInterface $container,
+        $detailUrlProviderServiceName
+    ) {
         $this->dqlConverter = $dqlConverter;
         $this->em = $em;
         $this->namespace = $namespace;
@@ -63,7 +68,7 @@ final class Search
 
     /**
      * @param string $tableName
-     * @param $queryParams
+     * @param string $queryParams
      * @return NQLQuery
      * @throws \Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException
      * @throws NotFoundHttpException
@@ -81,7 +86,7 @@ final class Search
 
 
     /**
-     * @param $str
+     * @param string $str
      * @param bool $addDetailUrls
      * @return array
      */
@@ -93,12 +98,12 @@ final class Search
             try {
                 $columns = $this->getEntityStringColumns($entity);
 
-                if(count($columns)) {
+                if (count($columns)) {
                     $query = '{';
 
                     $count = count($columns);
 
-                    foreach($columns as $i=>$column) {
+                    foreach ($columns as $i => $column) {
                         $query .= $column . ' LIKE "%' . $str . '%"';
                         if ($i + 1 < $count) {
                             $query .= ' OR ';
@@ -114,14 +119,15 @@ final class Search
                     }
                 }
             } catch (\Exception $e) {
+                // @todo @MartinMatejka Do you really need general exception here?
                 dump($e); // @todo - @martinMatejka
                 die();
             }
         }
 
-        if($addDetailUrls) {
-            foreach($results as &$result) {
-                foreach($result as &$item) {
+        if ($addDetailUrls) {
+            foreach ($results as &$result) {
+                foreach ($result as &$item) {
                     $item->{'_detail'} = $this->detailUrlProvider->getUrl($item);
                 }
             }
@@ -129,6 +135,7 @@ final class Search
 
         return $results;
     }
+
 
     /**
      * @param $query
@@ -254,8 +261,9 @@ final class Search
         $objNormalizer->setCircularReferenceHandler(function() { return ''; });
         $normalizers = [$objNormalizer];
 
-        return (new Serializer($normalizers, $encoders))->serialize($entities,'json');
+        return (new Serializer($normalizers, $encoders))->serialize($entities, 'json');
     }
+
 
     /** @noinspection GenericObjectTypeUsageInspection */
     /**
@@ -300,7 +308,7 @@ final class Search
 
         $annotationReader = new AnnotationReader();
 
-        foreach($classNames as $i=>$className) {
+        foreach ($classNames as $i => $className) {
             $className = $classNames[$i];
             $classMetaData = $this->em->getClassMetadata($className);
 
@@ -308,12 +316,15 @@ final class Search
                 $currentEntityName = strtolower($classMetaData->getReflectionClass()->getShortName());
                 $searchingEntityName = strtolower($entityName);
                 if ($currentEntityName === $searchingEntityName) {
+                    /** @var array $allColumnNames */
                     $allColumnNames = $classMetaData->getFieldNames();
                     $columnNames = [];
 
                     foreach ($allColumnNames as $columnName) {
                         try {
-                            $annotations = $annotationReader->getPropertyAnnotations(new \ReflectionProperty($classMetaData->getName(), $columnName));
+                            $annotations = $annotationReader->getPropertyAnnotations(
+                                new \ReflectionProperty($classMetaData->getName(), $columnName)
+                            );
 
                             if ($classMetaData->getTypeOfField($columnName) === 'string') {
                                 $isEnum = false;
@@ -325,7 +336,6 @@ final class Search
                                     }
                                 }
                                 if (!$isEnum) {
-
                                     $columnNames[] = $columnName;
                                 }
                             }
@@ -346,8 +356,9 @@ final class Search
      * @param \ReflectionClass $reflectionClass
      * @return \ReflectionProperty[]
      */
-    private function getClassProperties($reflectionClass) {
-        if($reflectionClass === null || !$reflectionClass) {
+    private function getClassProperties($reflectionClass)
+    {
+        if ($reflectionClass === null || !$reflectionClass) {
             return [];
         }
 

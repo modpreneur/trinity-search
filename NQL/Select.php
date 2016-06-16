@@ -5,9 +5,7 @@
 
 namespace Trinity\Bundle\SearchBundle\NQL;
 
-
 use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
-
 
 /**
  * Class Select
@@ -37,7 +35,7 @@ class Select
     {
         $selection = new Select();
 
-        $columns = preg_split('/,/', $str);
+        $columns = explode(',', $str);
 
         foreach ($columns as &$column) {
             $column = Column::parse($column);
