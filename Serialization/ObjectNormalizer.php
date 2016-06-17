@@ -100,8 +100,8 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             $property = $reflectionObject->getProperty($attribute);
             $property->setAccessible(true);
             $value = $property->getValue($object);
-        } catch (\Exception $e) {
-            // @todo @MartinMatejka what here?
+        } catch (\ReflectionException $e) {
+            
         }
 
         if ($value === null) {

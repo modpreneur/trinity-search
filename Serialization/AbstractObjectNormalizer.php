@@ -115,7 +115,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     }
 
 
-    //@todo @MartinMatejka Arguments with default values must be at the end
     /**
      * Gets and caches attributes for the given object, format and context.
      *
@@ -125,7 +124,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @return string[]
      */
-    protected function getAttributes($object, $format = null, array $context)
+    protected function getAttributes($object, $format = null, array $context = [])
     {
         $class = get_class($object);
         $key = $class.'-'.$context['cache_key'];

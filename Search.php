@@ -7,6 +7,7 @@ namespace Trinity\Bundle\SearchBundle;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\ORMException;
 use Doctrine\ORM\PersistentCollection;
 use JMS\Serializer\Naming\SerializedNameAnnotationStrategy;
 use JMS\Serializer\SerializationContext;
@@ -16,12 +17,14 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Constraints\Choice;
+use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
 use Trinity\Bundle\SearchBundle\NQL\Column;
 use Trinity\Bundle\SearchBundle\NQL\DQLConverter;
 use Trinity\Bundle\SearchBundle\NQL\NQLQuery;
 use Trinity\Bundle\SearchBundle\NQL\Select;
 use Trinity\Bundle\SearchBundle\Serialization\ObjectNormalizer;
 use Trinity\Bundle\SearchBundle\Utils\StringUtils;
+use Trinity\Component\Utils\Exception\MemberAccessException;
 use Trinity\Component\Utils\Utils\ObjectMixin;
 
 /**
@@ -118,10 +121,15 @@ final class Search
                         $results[$entity] = $result;
                     }
                 }
-            } catch (\Exception $e) {
-                // @todo @MartinMatejka Do you really need general exception here?
-                dump($e); // @todo - @martinMatejka
-                die();
+            }
+            catch (ORMException $e) { 
+                
+            }
+            catch (NotFoundHttpException $e) { 
+                
+            }
+            catch (SyntaxErrorException $e) { 
+                
             }
         }
 
@@ -183,7 +191,7 @@ final class Search
     {
         try {
             $obj = ObjectMixin::get($entity, $values[$curValueIndex]);
-        } catch (\Exception $ex) {
+        } catch (MemberAccessException $ex) {
             $obj = '';
         }
 
