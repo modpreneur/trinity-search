@@ -97,9 +97,9 @@ final class Search
     {
         $results = [];
 
-        foreach ($this->dqlConverter->getAvailableEntities() as $entity) {
+        foreach ($this->dqlConverter->getAvailableEntities() as $entityName => $entityClass) {
             try {
-                $columns = $this->getEntityStringColumns($entity);
+                $columns = $this->getEntityStringColumns($entityClass);
 
                 if (count($columns)) {
                     $query = '{';
@@ -115,21 +115,21 @@ final class Search
 
                     $query .= '} LIMIT=10';
 
-                    $result = $this->queryTable($entity, $query)->getQueryBuilder()->getQuery()->getResult();
+                    $result = $this->queryTable($entityName, $query)->getQueryBuilder()->getQuery()->getResult();
 
                     if (count($result)) {
-                        $results[$entity] = $result;
+                        $results[$entityName] = $result;
                     }
                 }
             }
             catch (ORMException $e) { 
-                
+
             }
-            catch (NotFoundHttpException $e) { 
-                
+            catch (NotFoundHttpException $e) {
+
             }
-            catch (SyntaxErrorException $e) { 
-                
+            catch (SyntaxErrorException $e) {
+
             }
         }
 
@@ -312,49 +312,47 @@ final class Search
     protected function getEntityStringColumns($entityName)
     {
         // Go through all the classes
-        $classNames = $this->em->getConfiguration()->getMetadataDriverImpl()->getAllClassNames();
+        $classNames = $this->dqlConverter->getAvailableEntities();
 
         $annotationReader = new AnnotationReader();
+        $searchingEntityName = strtolower($entityName);
 
         foreach ($classNames as $i => $className) {
             $className = $classNames[$i];
             $classMetaData = $this->em->getClassMetadata($className);
 
-            if (StringUtils::startsWith($className, $this->namespace)) {
-                $currentEntityName = strtolower($classMetaData->getReflectionClass()->getShortName());
-                $searchingEntityName = strtolower($entityName);
-                if ($currentEntityName === $searchingEntityName) {
-                    /** @var array $allColumnNames */
-                    $allColumnNames = $classMetaData->getFieldNames();
-                    $columnNames = [];
+            $currentEntityName = strtolower($classMetaData->getReflectionClass()->getName());
 
-                    foreach ($allColumnNames as $columnName) {
-                        try {
-                            $annotations = $annotationReader->getPropertyAnnotations(
-                                new \ReflectionProperty($classMetaData->getName(), $columnName)
-                            );
+            if ($currentEntityName === $searchingEntityName) {
+                /** @var array $allColumnNames */
+                $allColumnNames = $classMetaData->getFieldNames();
+                $columnNames = [];
 
-                            if ($classMetaData->getTypeOfField($columnName) === 'string') {
-                                $isEnum = false;
+                foreach ($allColumnNames as $columnName) {
+                    try {
+                        $annotations = $annotationReader->getPropertyAnnotations(
+                            new \ReflectionProperty($classMetaData->getName(), $columnName)
+                        );
 
-                                foreach ($annotations as $annotation) {
-                                    if ($annotation instanceof Choice) {
-                                        $isEnum = true;
-                                        break;
-                                    }
-                                }
-                                if (!$isEnum) {
-                                    $columnNames[] = $columnName;
+                        if ($classMetaData->getTypeOfField($columnName) === 'string') {
+                            $isEnum = false;
+
+                            foreach ($annotations as $annotation) {
+                                if ($annotation instanceof Choice) {
+                                    $isEnum = true;
+                                    break;
                                 }
                             }
-                        } catch (\Exception $e) {
-                            dump($e);
-                            die();
+                            if (!$isEnum) {
+                                $columnNames[] = $columnName;
+                            }
                         }
+                    } catch (\ReflectionException $e) {
+                        
                     }
-
-                    return $columnNames;
                 }
+
+                return $columnNames;
             }
         }
         return [];
