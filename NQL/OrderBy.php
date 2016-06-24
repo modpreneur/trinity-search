@@ -89,9 +89,9 @@ class OrderBy
     /**
      * @param string $oldColumnName
      * @param string[] $newColumnNames
-     * @param array $newSortOrders
+     * @param array $flipSortOrders
      */
-    public function replaceColumn($oldColumnName, array $newColumnNames, array $newSortOrders = [])
+    public function replaceColumn($oldColumnName, array $newColumnNames, array $flipSortOrders = [])
     {
         $newColumnNamesCount = count($newColumnNames);
 
@@ -108,7 +108,13 @@ class OrderBy
                         $newColumns = [];
                         foreach ($newColumnNames as $j => $newColumnName) {
                             $newColumn = new OrderingColumn($newColumnName, $column->getAlias(), $column->getWrappingFunction(), $column->getJoinWith());
-                            $newColumn->setOrdering($i < count($newSortOrders) ? $newSortOrders[$j] : $column->getOrdering());
+                            $newColumn->setOrdering($column->getOrdering());
+
+                            /** @noinspection NotOptimalIfConditionsInspection */
+                            if ($j < count($flipSortOrders) && $flipSortOrders[$j]) {
+                                $newColumn->flipOrdering();
+                            }
+
                             $newColumns[] = $newColumn;
                         }
 
@@ -120,8 +126,9 @@ class OrderBy
                     } else {
                         $column->setName($newColumnNames[0]);
 
-                        if (count($newSortOrders)) {
-                            $column->setOrdering($newSortOrders[0]);
+                        /** @noinspection NotOptimalIfConditionsInspection */
+                        if (count($flipSortOrders) && $flipSortOrders[0]) {
+                            $column->flipOrdering();
                         }
                     }
                 }

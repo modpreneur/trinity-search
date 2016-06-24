@@ -62,4 +62,18 @@ class OrderingColumn extends Column
 
         return $column;
     }
+
+
+    /**
+     * Flip ordering
+     */
+    public function flipOrdering()
+    {
+        if ($this->ordering === 'ASC') {
+            $this->ordering = 'DESC';
+        } /** @noinspection DefaultValueInElseBranchInspection */
+        else {
+            $this->ordering = 'ASC';
+        }
+    }
 }
