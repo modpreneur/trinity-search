@@ -11,7 +11,7 @@ namespace Trinity\Bundle\SearchBundle\NQL;
  */
 class OrderingColumn extends Column
 {
-    /** @var string  */
+    /** @var string */
     private $ordering = 'ASC';
 
 
@@ -27,7 +27,7 @@ class OrderingColumn extends Column
     /**
      * @param string $ordering
      */
-    private function setOrdering($ordering)
+    public function setOrdering($ordering)
     {
         $this->ordering = $ordering;
     }

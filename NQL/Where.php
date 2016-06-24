@@ -75,6 +75,8 @@ class Where
 
         // LOOP THROUGH ALL CHARACTERS
         $iMax = strlen($str);
+
+        /** @noinspection ForeachInvariantsInspection */
         for ($i = 0; $i < $iMax; $i++) {
             // IF CHARACTER IS LEFT BRACKET, FIND PAIR BRACKET AND RECURSIVELY FIND CONDITIONS WITHIN THESE BRACKETS
             if ($str[$i] === '(') {
@@ -135,7 +137,7 @@ class Where
                         $parts[] = $part;
                         $i = $i + strlen($match[0]) - 1;
                     } else {
-                        $part = new WherePartType();
+                        $part = new WherePart();
                         $part->type = 'UNKNOWN';
                         $part->value = $str[$i];
 
@@ -216,5 +218,76 @@ class Where
     public function getConditions() : array
     {
         return $this->conditions;
+    }
+
+
+    /** @noinspection MoreThanThreeArgumentsInspection
+     * @param WherePart[] $whereParts
+     * @param $oldColumnName
+     * @param array $newColumnNames
+     * @param string $joiningOperator
+     */
+    public function replaceColumn($oldColumnName, array $newColumnNames, $joiningOperator = Operator:: OR, /** @noinspection ParameterByRefWithDefaultInspection */
+                                  &$whereParts = null)
+    {
+        if ($whereParts === null) {
+            $whereParts = &$this->conditions;
+        }
+
+        $newColumnNamesCount = count($newColumnNames);
+
+        if (count($newColumnNames)) {
+            $partsCount = count($whereParts);
+
+            // Loop through all where parts
+            /** @noinspection ForeachInvariantsInspection */
+            for ($i = 0; $i < $partsCount; $i++) {
+
+                $wherePart = $whereParts[$i];
+
+                // Match column we are looking for
+                if ($wherePart->type === WherePartType::CONDITION && $wherePart->key->getName() === $oldColumnName) {
+                    $column = $wherePart->key;
+
+                    if ($newColumnNamesCount > 1) { // If column is being replaced by multiple ones
+
+                        // Create subcondition instead of original condition
+                        $newWherePart = new WherePart();
+                        $newWherePart->type = WherePartType::SUBCONDITION;
+                        $newWherePart->subTree = [];
+
+                        foreach ($newColumnNames as $j => $newColumnName) {
+                            // Create and add condition into subcondition
+                            $newInnerWherePart = new WherePart();
+                            $newInnerWherePart->type = WherePartType::CONDITION;
+                            $newInnerWherePart->key = new Column($newColumnName, $column->getAlias(), $column->getWrappingFunction(), $column->getJoinWith());
+                            $newInnerWherePart->value = $wherePart->value;
+                            $newInnerWherePart->operator = $wherePart->operator;
+
+                            $newWherePart->subTree[] = $newInnerWherePart;
+
+                            // Add joining operator
+                            if ($j < $newColumnNamesCount - 1) {
+                                $operatorWherePart = new WherePart();
+                                $operatorWherePart->type = WherePartType::OPERATOR;
+                                $operatorWherePart->value = $joiningOperator;
+
+                                $newWherePart->subTree[] = $operatorWherePart;
+                            }
+                        }
+
+                        $whereParts[$i] = $newWherePart;
+
+                        $partsCount = count($whereParts);
+
+                    } else { // If column is replaced to another single one
+                        $column->setName($newColumnNames[0]);
+                    }
+
+                } else if ($wherePart->type === WherePartType::SUBCONDITION) {
+                    $this->replaceColumn($oldColumnName, $newColumnNames, $joiningOperator, $wherePart->subTree);
+                }
+            }
+        }
     }
 }

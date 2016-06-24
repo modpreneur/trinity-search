@@ -63,6 +63,7 @@ class OrderBy
             }
 
             $col = $args[0];
+            /** @noinspection MultiAssignmentUsageInspection */
             $ordering = $args[1];
 
             if (strcasecmp($ordering, 'ASC') !== 0 && strcasecmp($ordering, 'DESC') !== 0) {
@@ -83,5 +84,48 @@ class OrderBy
     public static function getBlank()
     {
         return new OrderBy();
+    }
+
+    /**
+     * @param string $oldColumnName
+     * @param string[] $newColumnNames
+     * @param array $newSortOrders
+     */
+    public function replaceColumn($oldColumnName, array $newColumnNames, array $newSortOrders = [])
+    {
+        $newColumnNamesCount = count($newColumnNames);
+
+        if ($newColumnNamesCount) {
+            $columnsCount = count($this->columns);
+
+            /** @noinspection ForeachInvariantsInspection */
+            for ($i = 0; $i < $columnsCount; $i++) {
+                $column = $this->columns[$i];
+
+                if ($column->getName() === $oldColumnName) {
+                    if ($newColumnNamesCount > 1) {
+
+                        $newColumns = [];
+                        foreach ($newColumnNames as $j => $newColumnName) {
+                            $newColumn = new OrderingColumn($newColumnName, $column->getAlias(), $column->getWrappingFunction(), $column->getJoinWith());
+                            $newColumn->setOrdering($i < count($newSortOrders) ? $newSortOrders[$j] : $column->getOrdering());
+                            $newColumns[] = $newColumn;
+                        }
+
+                        array_splice($this->columns, $i, 1, $newColumns);
+
+                        $i += count($newColumns) - 1;
+                        $columnsCount = count($this->columns);
+
+                    } else {
+                        $column->setName($newColumnNames[0]);
+
+                        if (count($newSortOrders)) {
+                            $column->setOrdering($newSortOrders[0]);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

@@ -14,7 +14,7 @@ use Trinity\Bundle\SearchBundle\Utils\StringUtils;
  */
 class Column
 {
-    private static $regFuncColumn = '/(?J)(^((?P<function>[^\s]+)\(((?P<alias>[^\s\.]+)\.)?((?P<joinWith>[^\s\.]+)\.)?(?P<column>[^\s]+)\))$)|(^((?P<alias>[^\s\.]+)\.)?((?P<joinWith>[^\s\.]+):)?(?P<column>[^\s]+)$)/';
+    private static $regFuncColumn = '/(?J)(^((?P<function>\S+)\(((?P<alias>[^\s\.]+)\.)?((?P<joinWith>[^\s\.]+)\.)?(?P<column>\S+)\))$)|(^((?P<alias>[^\s\.]+)\.)?((?P<joinWith>[^\s\.]+):)?(?P<column>\S+)$)/';
 
     private $name;
     private $wrappingFunction;
@@ -22,7 +22,8 @@ class Column
     private $joinWith;
 
 
-    /**
+    /** @noinspection MoreThanThreeArgumentsInspection
+     * 
      * Column constructor.
      * @param $name
      * @param null $alias
@@ -92,6 +93,15 @@ class Column
 
 
     /**
+     * @param $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+
+    /**
      * @return string
      */
     public function getFullName() : string
@@ -128,10 +138,12 @@ class Column
             $name = $match['column'];
             $alias = null === $alias ? $match['alias'] : $alias;
             $function = $match['function'];
+            
+            /** @noinspection NestedTernaryOperatorInspection */
             $joinWith =
                 null === $alias ?
                     $match['alias'] :
-                    StringUtils::isEmpty($match['joinWith']) ? [] : explode(':',$match['joinWith']);
+                    StringUtils::isEmpty($match['joinWith']) ? [] : explode(':', $match['joinWith']);
             return new Column($name, $alias, $function, $joinWith);
         } else {
             throw new SyntaxErrorException("Invalid column name '$column'");
