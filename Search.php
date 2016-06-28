@@ -6,6 +6,7 @@
 namespace Trinity\Bundle\SearchBundle;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\DBAL\Exception\InvalidFieldNameException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\PersistentCollection;
@@ -33,7 +34,7 @@ use Trinity\Component\Utils\Utils\ObjectMixin;
  */
 final class Search
 {
-    /** @var DQLConverter  */
+    /** @var DQLConverter */
     private $dqlConverter;
 
     /** @var EntityManager */
@@ -62,7 +63,8 @@ final class Search
         $namespace,
         ContainerInterface $container,
         $detailUrlProviderServiceName
-    ) {
+    )
+    {
         $this->dqlConverter = $dqlConverter;
         $this->em = $em;
         $this->namespace = $namespace;
@@ -99,49 +101,61 @@ final class Search
 
         foreach ($this->dqlConverter->getAvailableEntities() as $entityName => $entityClass) {
             try {
-                $columns = $this->getEntityStringColumns($entityClass);
-
-                if (count($columns)) {
-                    $query = '{';
-
-                    $count = count($columns);
-
-                    foreach ($columns as $i => $column) {
-                        $query .= $column . ' LIKE "%' . $str . '%"';
-                        if ($i + 1 < $count) {
-                            $query .= ' OR ';
-                        }
-                    }
-
-                    $query .= '} LIMIT=10';
-
-                    $result = $this->queryTable($entityName, $query)->getQueryBuilder()->getQuery()->getResult();
-
-                    if (count($result)) {
-                        $results[$entityName] = $result;
-                    }
-                }
-            }
-            catch (ORMException $e) { 
-
-            }
-            catch (NotFoundHttpException $e) {
-
-            }
-            catch (SyntaxErrorException $e) {
-
-            }
-        }
-
-        if ($addDetailUrls) {
-            foreach ($results as &$result) {
-                foreach ($result as &$item) {
-                    $item->{'_detail'} = $this->detailUrlProvider->getUrl($item);
-                }
+                $results[$entityName] = $this->queryEntity($entityName, $entityClass, $str, $addDetailUrls);
+                
+            } catch (ORMException $e) {
+                \Symfony\Component\VarDumper\VarDumper::dump($e);
+                die();
+            } catch (NotFoundHttpException $e) {
+                \Symfony\Component\VarDumper\VarDumper::dump($e);
+                die();
+            } catch (SyntaxErrorException $e) {
+                \Symfony\Component\VarDumper\VarDumper::dump($e);
+                die();
+            } catch (InvalidFieldNameException $e) {
+                \Symfony\Component\VarDumper\VarDumper::dump($e);
+                die();
             }
         }
 
         return $results;
+    }
+
+    private function queryEntity($entityName, $entityClass, $str, $addDetailUrls = false)
+    {
+        $result = [];
+
+        $columns = $this->getEntityStringColumns($entityClass);
+
+        if (count($columns)) {
+            $query = '{';
+
+            $count = count($columns);
+
+            foreach ($columns as $i => $column) {
+                $query .= $column . ' LIKE "%' . $str . '%"';
+                if ($i + 1 < $count) {
+                    $query .= ' OR ';
+                }
+            }
+
+            $query .= '} LIMIT=10';
+
+            $result = $this->queryTable($entityName, $query)->getQueryBuilder()->getQuery()->getResult();
+
+            if (count($result)) {
+                $results[$entityName] = $result;
+            }
+        }
+
+        if ($addDetailUrls) {
+            foreach ($result as &$item) {
+                $item->{'_detail'} = $this->detailUrlProvider->getUrl($item);
+            }
+            unset($item);
+        }
+
+        return $result;
     }
 
 
@@ -266,7 +280,9 @@ final class Search
         $encoders = [new JsonEncoder()];
         $objNormalizer = new ObjectNormalizer();
         $objNormalizer->setCircularReferenceLimit(0);
-        $objNormalizer->setCircularReferenceHandler(function() { return ''; });
+        $objNormalizer->setCircularReferenceHandler(function () {
+            return '';
+        });
         $normalizers = [$objNormalizer];
 
         return (new Serializer($normalizers, $encoders))->serialize($entities, 'json');
@@ -348,7 +364,7 @@ final class Search
                             }
                         }
                     } catch (\ReflectionException $e) {
-                        
+
                     }
                 }
 
