@@ -104,17 +104,13 @@ final class Search
                 $results[$entityName] = $this->queryEntity($entityName, $entityClass, $str, $addDetailUrls);
 
             } catch (ORMException $e) {
-                \Symfony\Component\VarDumper\VarDumper::dump($e);
-                die();
+
             } catch (NotFoundHttpException $e) {
-                \Symfony\Component\VarDumper\VarDumper::dump($e);
-                die();
+
             } catch (SyntaxErrorException $e) {
-                \Symfony\Component\VarDumper\VarDumper::dump($e);
-                die();
+
             } catch (InvalidFieldNameException $e) {
-                \Symfony\Component\VarDumper\VarDumper::dump($e);
-                die();
+
             }
         }
 
