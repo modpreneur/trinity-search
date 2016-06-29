@@ -104,13 +104,17 @@ final class Search
                 $results[$entityName] = $this->queryEntity($entityName, $entityClass, $str, $addDetailUrls);
 
             } catch (ORMException $e) {
-
+                \Symfony\Component\VarDumper\VarDumper::dump($e);
+                die();
             } catch (NotFoundHttpException $e) {
-
+                \Symfony\Component\VarDumper\VarDumper::dump($e);
+                die();
             } catch (SyntaxErrorException $e) {
-
+                \Symfony\Component\VarDumper\VarDumper::dump($e);
+                die();
             } catch (InvalidFieldNameException $e) {
-
+                \Symfony\Component\VarDumper\VarDumper::dump($e);
+                die();
             }
         }
 
@@ -119,26 +123,27 @@ final class Search
 
     /**
      * @param $entityName
+     * @param $queryColumns
      * @param $entityClass
      * @param $str
      * @param bool $addDetailUrls
-     * @return array
+     * @return NQLQuery
      * @throws \Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      * @throws \Doctrine\ORM\ORMException
      */
-    public function queryEntity($entityName, $entityClass, $str, $addDetailUrls = false)
+    public function queryEntity($entityName, $queryColumns, $entityClass, $str, $addDetailUrls = false) : NQLQuery
     {
-        $result = [];
-
         if ($entityClass === null) {
             $entityClass = $this->dqlConverter->getAvailableEntities()[$entityName];
         }
 
         $columns = $this->getEntityStringColumns($entityClass);
 
+        $query = '(' . $queryColumns . ')';
+
         if (count($columns)) {
-            $query = '{';
+            $query .= '{';
 
             $count = count($columns);
 
@@ -150,22 +155,9 @@ final class Search
             }
 
             $query .= '} LIMIT=10';
-
-            $result = $this->queryTable($entityName, $query)->getQueryBuilder()->getQuery()->getResult();
-
-            if (count($result)) {
-                $results[$entityName] = $result;
-            }
         }
 
-        if ($addDetailUrls) {
-            foreach ($result as &$item) {
-                $item->{'_detail'} = $this->detailUrlProvider->getUrl($item);
-            }
-            unset($item);
-        }
-
-        return $result;
+        return $this->queryTable($entityName, $query);
     }
 
 
