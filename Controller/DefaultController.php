@@ -14,6 +14,7 @@ use FOS\RestBundle\Request\ParamFetcher;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
 use Trinity\Bundle\SearchBundle\NQL\NQLQuery;
 use Trinity\Bundle\SearchBundle\Search;
 use Trinity\Bundle\SearchBundle\Utils\StringUtils;
@@ -32,6 +33,7 @@ class DefaultController extends FOSRestController
      * @param string $tableName
      *
      * @return JsonResponse
+     * @throws \Doctrine\ORM\ORMException
      *
      * @throws \Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
@@ -57,13 +59,19 @@ class DefaultController extends FOSRestController
                 ['Content-Type' => 'application/json']
             );
         } else {
-            /** @var NQLQuery $nqlQuery */
-            $nqlQuery = $search->queryTable($tableName, $queryParams);
-            return new Response(
-                $search->convertToJson($nqlQuery, count($nqlQuery->getSelect()->getColumns())),
-                200,
-                ['Content-Type' => 'application/json']
-            );
+            try {
+                /** @var NQLQuery $nqlQuery */
+                $nqlQuery = $search->queryTable($tableName, $queryParams);
+                return new Response(
+                    $search->convertToJson($nqlQuery, count($nqlQuery->getSelect()->getColumns())),
+                    200,
+                    ['Content-Type' => 'application/json']
+                );
+
+            } catch (SyntaxErrorException $e) {
+                $result = $search->queryEntity($tableName, null, $queryParams, true);
+                return new Response($search->convertArrayToJson($result));
+            }
         }
     }
 }

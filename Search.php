@@ -102,7 +102,7 @@ final class Search
         foreach ($this->dqlConverter->getAvailableEntities() as $entityName => $entityClass) {
             try {
                 $results[$entityName] = $this->queryEntity($entityName, $entityClass, $str, $addDetailUrls);
-                
+
             } catch (ORMException $e) {
                 \Symfony\Component\VarDumper\VarDumper::dump($e);
                 die();
@@ -121,9 +121,23 @@ final class Search
         return $results;
     }
 
-    private function queryEntity($entityName, $entityClass, $str, $addDetailUrls = false)
+    /**
+     * @param $entityName
+     * @param $entityClass
+     * @param $str
+     * @param bool $addDetailUrls
+     * @return array
+     * @throws \Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function queryEntity($entityName, $entityClass, $str, $addDetailUrls = false)
     {
         $result = [];
+
+        if ($entityClass === null) {
+            $entityClass = $this->dqlConverter->getAvailableEntities()[$entityName];
+        }
 
         $columns = $this->getEntityStringColumns($entityClass);
 
