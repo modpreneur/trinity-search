@@ -101,12 +101,18 @@ final class Search
 
         foreach ($this->dqlConverter->getAvailableEntities() as $entityName => $entityClass) {
             try {
-                $results[$entityName] = $this->queryEntity($entityName, null, $entityClass, $str, 10)->getQueryBuilder(true)->getQuery()->getResult();
+                $nqlQuery = $this->queryEntity($entityName, null, $entityClass, $str, 10);
 
-                if ($addDetailUrls) {
-                    foreach ($results[$entityName] as &$result) {
-                        foreach ($result as &$item) {
-                            $item->{'_detail'} = $this->detailUrlProvider->getUrl($item);
+                if($nqlQuery !== null) {
+                    $queryResult = $nqlQuery->getQueryBuilder(true)->getQuery()->getResult();
+
+                    if(count($queryResult)) {
+                        $results[$entityName] = $queryResult;
+
+                        if ($addDetailUrls) {
+                            foreach ($results[$entityName] as &$result) {
+                                $result->{'_detail'} = $this->detailUrlProvider->getUrl($result);
+                            }
                         }
                     }
                 }
@@ -132,12 +138,12 @@ final class Search
      * @param $str
      * @param null $limit
      * @param null $offset
-     * @return NQLQuery
+     * @return NQLQuery | null
      * @throws \Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      * @throws \Doctrine\ORM\ORMException
      */
-    public function queryEntity($entityName, $queryColumns, $entityClass, $str, $limit = null, $offset = null) : NQLQuery
+    public function queryEntity($entityName, $queryColumns, $entityClass, $str, $limit = null, $offset = null)
     {
         if ($entityClass === null) {
             $entityClass = $this->dqlConverter->getAvailableEntities()[$entityName];
@@ -164,6 +170,10 @@ final class Search
             }
 
             $query .= '}';
+        }
+
+        if($queryColumns === null && !count($columns)) {
+            return null;
         }
 
         if ($limit !== null) {
