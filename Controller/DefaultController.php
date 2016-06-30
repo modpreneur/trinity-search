@@ -69,7 +69,7 @@ class DefaultController extends FOSRestController
                 );
 
             } catch (SyntaxErrorException $e) {
-                $result = $search->queryEntity($tableName, null, $queryParams, true);
+                $result = $search->queryEntity($tableName, null, null, $queryParams)->getQueryBuilder()->getQuery()->getResult();
                 return new Response($search->convertArrayToJson($result));
             }
         }

@@ -101,20 +101,24 @@ final class Search
 
         foreach ($this->dqlConverter->getAvailableEntities() as $entityName => $entityClass) {
             try {
-                $results[$entityName] = $this->queryEntity($entityName, $entityClass, $str, $addDetailUrls);
+                $results[$entityName] = $this->queryEntity($entityName, null, $entityClass, $str, 10)->getQueryBuilder(true)->getQuery()->getResult();
+
+                if ($addDetailUrls) {
+                    foreach ($results[$entityName] as &$result) {
+                        foreach ($result as &$item) {
+                            $item->{'_detail'} = $this->detailUrlProvider->getUrl($item);
+                        }
+                    }
+                }
 
             } catch (ORMException $e) {
-                \Symfony\Component\VarDumper\VarDumper::dump($e);
-                die();
+
             } catch (NotFoundHttpException $e) {
-                \Symfony\Component\VarDumper\VarDumper::dump($e);
-                die();
+
             } catch (SyntaxErrorException $e) {
-                \Symfony\Component\VarDumper\VarDumper::dump($e);
-                die();
+
             } catch (InvalidFieldNameException $e) {
-                \Symfony\Component\VarDumper\VarDumper::dump($e);
-                die();
+
             }
         }
 
@@ -126,13 +130,14 @@ final class Search
      * @param $queryColumns
      * @param $entityClass
      * @param $str
-     * @param bool $addDetailUrls
+     * @param null $limit
+     * @param null $offset
      * @return NQLQuery
      * @throws \Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      * @throws \Doctrine\ORM\ORMException
      */
-    public function queryEntity($entityName, $queryColumns, $entityClass, $str, $addDetailUrls = false) : NQLQuery
+    public function queryEntity($entityName, $queryColumns, $entityClass, $str, $limit = null, $offset = null) : NQLQuery
     {
         if ($entityClass === null) {
             $entityClass = $this->dqlConverter->getAvailableEntities()[$entityName];
@@ -140,7 +145,11 @@ final class Search
 
         $columns = $this->getEntityStringColumns($entityClass);
 
-        $query = '(' . $queryColumns . ')';
+        $query = '';
+
+        if($queryColumns !== null) {
+            $query .= '(' . $queryColumns . ')';
+        }
 
         if (count($columns)) {
             $query .= '{';
@@ -154,7 +163,15 @@ final class Search
                 }
             }
 
-            $query .= '} LIMIT=10';
+            $query .= '}';
+        }
+
+        if ($limit !== null) {
+            $query .= ' LIMIT=' . $limit;
+
+            if ($offset !== null) {
+                $query .= ' OFFSET=' . $offset;
+            }
         }
 
         return $this->queryTable($entityName, $query);
