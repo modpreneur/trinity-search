@@ -103,10 +103,10 @@ final class Search
             try {
                 $nqlQuery = $this->queryEntity($entityName, null, $entityClass, $str, 10);
 
-                if($nqlQuery !== null) {
+                if ($nqlQuery !== null) {
                     $queryResult = $nqlQuery->getQueryBuilder(true)->getQuery()->getResult();
 
-                    if(count($queryResult)) {
+                    if (count($queryResult)) {
                         $results[$entityName] = $queryResult;
 
                         if ($addDetailUrls) {
@@ -136,14 +136,15 @@ final class Search
      * @param $queryColumns
      * @param $entityClass
      * @param $str
-     * @param null $limit
-     * @param null $offset
+     * @param null|string $limit
+     * @param null|string $offset
+     * @param null|string $orderBy
      * @return NQLQuery | null
      * @throws \Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      * @throws \Doctrine\ORM\ORMException
      */
-    public function queryEntity($entityName, $queryColumns, $entityClass, $str, $limit = null, $offset = null)
+    public function queryEntity($entityName, $queryColumns, $entityClass, $str, $limit = null, $offset = null, $orderBy = null)
     {
         if ($entityClass === null) {
             $entityClass = $this->dqlConverter->getAvailableEntities()[$entityName];
@@ -153,7 +154,7 @@ final class Search
 
         $query = '';
 
-        if($queryColumns !== null) {
+        if ($queryColumns !== null) {
             $query .= '(' . $queryColumns . ')';
         }
 
@@ -172,7 +173,7 @@ final class Search
             $query .= '}';
         }
 
-        if($queryColumns === null && !count($columns)) {
+        if ($queryColumns === null && !count($columns)) {
             return null;
         }
 
@@ -182,6 +183,10 @@ final class Search
             if ($offset !== null) {
                 $query .= ' OFFSET=' . $offset;
             }
+        }
+
+        if ($orderBy !== null) {
+            $query .= ' ORDERBY ' . $orderBy;
         }
 
         return $this->queryTable($entityName, $query);
