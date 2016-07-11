@@ -45,6 +45,7 @@ final class Search
     /** @var DetailUrlProvider */
     private $detailUrlProvider;
 
+
     /**
      * Search constructor.p
      * @param EntityManager $em
@@ -62,13 +63,13 @@ final class Search
         $namespace,
         ContainerInterface $container,
         $detailUrlProviderServiceName
-    )
-    {
+    ) {
         $this->dqlConverter = $dqlConverter;
         $this->em = $em;
         $this->namespace = $namespace;
         $this->detailUrlProvider = $container->get($detailUrlProviderServiceName);
     }
+
 
     /**
      * @param string $tableName
@@ -115,7 +116,7 @@ final class Search
                         }
                     }
                 }
-
+            //@todo @MartinMatejka what here? return false, or return null, or log from monolog, like $this->get('logger')->addError($e);?
             } catch (ORMException $e) {
 
             } catch (NotFoundHttpException $e) {
@@ -399,7 +400,7 @@ final class Search
                             }
                         }
                     } catch (\ReflectionException $e) {
-
+                        //@todo @MartinMatejka what here, return false or return null or log?
                     }
                 }
 
