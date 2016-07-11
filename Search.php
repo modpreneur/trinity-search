@@ -24,7 +24,6 @@ use Trinity\Bundle\SearchBundle\NQL\DQLConverter;
 use Trinity\Bundle\SearchBundle\NQL\NQLQuery;
 use Trinity\Bundle\SearchBundle\NQL\Select;
 use Trinity\Bundle\SearchBundle\Serialization\ObjectNormalizer;
-use Trinity\Bundle\SearchBundle\Utils\StringUtils;
 use Trinity\Component\Utils\Exception\MemberAccessException;
 use Trinity\Component\Utils\Utils\ObjectMixin;
 
@@ -146,6 +145,8 @@ final class Search
      */
     public function queryEntity($entityName, $queryColumns, $entityClass, $str, $limit = null, $offset = null, $orderBy = null)
     {
+        $entityName = strtolower($entityName);
+
         if ($entityClass === null) {
             $entityClass = $this->dqlConverter->getAvailableEntities()[$entityName];
         }
