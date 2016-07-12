@@ -82,9 +82,6 @@ class NQLQuery
             throw new SyntaxErrorException('Incorrect query');
         }
 
-        //dump($query);
-        //exit;
-
         return $query;
     }
 

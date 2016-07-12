@@ -144,12 +144,25 @@ final class Search
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      * @throws \Doctrine\ORM\ORMException
      */
-    public function queryEntity($entityName, $queryColumns, $entityClass, $str, $limit = null, $offset = null, $orderBy = null)
-    {
-        $entityName = strtolower($entityName);
+    public function queryEntity(
+        $entityName,
+        $queryColumns,
+        $entityClass,
+        $str,
+        $limit = null,
+        $offset = null,
+        $orderBy = null
+    ) {
+            /*
+             * @TODO @MartinMatejka this should manage compatibility with elasticsearch,
+             * if doesnt needed in SQL dont lower
+             */
+        if ($str) {
+            $entityName = strtolower($entityName);
+        }
 
         if ($entityClass === null) {
-            $entityClass = $this->dqlConverter->getAvailableEntities()[$entityName];
+            $entityClass = $this->dqlConverter->getAvailableEntities()[$entityName]??null;
         }
 
         $columns = $this->getEntityStringColumns($entityClass);
