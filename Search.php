@@ -45,6 +45,7 @@ final class Search
     /** @var DetailUrlProvider */
     private $detailUrlProvider;
 
+
     /**
      * Search constructor.p
      * @param EntityManager $em
@@ -69,6 +70,7 @@ final class Search
         $this->namespace = $namespace;
         $this->detailUrlProvider = $container->get($detailUrlProviderServiceName);
     }
+
 
     /**
      * @param string $tableName
@@ -115,7 +117,7 @@ final class Search
                         }
                     }
                 }
-
+                //@todo @MartinMatejka what here? return false, or return null, or log from monolog, like $this->get('logger')->addError($e);?
             } catch (ORMException $e) {
 
             } catch (NotFoundHttpException $e) {
@@ -143,12 +145,26 @@ final class Search
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      * @throws \Doctrine\ORM\ORMException
      */
-    public function queryEntity($entityName, $queryColumns, $entityClass, $str, $limit = null, $offset = null, $orderBy = null)
+    public function queryEntity(
+        $entityName,
+        $queryColumns,
+        $entityClass,
+        $str,
+        $limit = null,
+        $offset = null,
+        $orderBy = null
+    )
     {
-        $entityName = strtolower($entityName);
+        /*
+         * @TODO @MartinMatejka this should manage compatibility with elasticsearch,
+         * if doesnt needed in SQL dont lower
+         */
+        if ($str) {
+            $entityName = strtolower($entityName);
+        }
 
         if ($entityClass === null) {
-            $entityClass = $this->dqlConverter->getAvailableEntities()[$entityName];
+            $entityClass = $this->dqlConverter->getAvailableEntities()[$entityName]??null;
         }
 
         $columns = $this->getEntityStringColumns($entityClass);
@@ -165,7 +181,7 @@ final class Search
             $count = count($columns);
 
             foreach ($columns as $i => $column) {
-                $query .= $column . ' LIKE "%' . $str . '%"';
+                $query .= 'LOWER(' . $column . ') LIKE "%' . strtolower($str) . '%"';
                 if ($i + 1 < $count) {
                     $query .= ' OR ';
                 }
@@ -399,7 +415,7 @@ final class Search
                             }
                         }
                     } catch (\ReflectionException $e) {
-
+                        //@todo @MartinMatejka what here, return false or return null or log?
                     }
                 }
 

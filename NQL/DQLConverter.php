@@ -24,7 +24,7 @@ class DQLConverter
         'ExceptionLog',
     ];
 
-    /** @var EntityManager  */
+    /** @var EntityManager */
     private $em;
 
     /** @var string[] */
@@ -66,8 +66,7 @@ class DQLConverter
         $query = $this->em->createQueryBuilder();
 
         /** @var string $columnDefaultAlias */
-        $columnDefaultAlias = count($nqlQuery->getFrom()->getTables()) === 1 ? $nqlQuery->getFrom()->getTables(
-        )[0]->getAlias() : '';
+        $columnDefaultAlias = count($nqlQuery->getFrom()->getTables()) === 1 ? $nqlQuery->getFrom()->getTables()[0]->getAlias() : '';
 
         if ($columnDefaultAlias === 'group') {
             $columnDefaultAlias = '_group';
@@ -107,7 +106,7 @@ class DQLConverter
             if (count($column->getJoinWith())) {
                 $joinWith = $column->getJoinWith();
                 $iMax = count($joinWith);
-                for ($i=0; $i<$iMax; $i++) {
+                for ($i = 0; $i < $iMax; $i++) {
                     if (!array_key_exists($joinWith[$i], $alreadyJoined)) {
                         if ($i === 0) {
                             $column = ($column->getAlias() === null ? $columnDefaultAlias : $column->getAlias()) . '.' . $column->getJoinWith()[$i];
@@ -127,7 +126,7 @@ class DQLConverter
             $query->addOrderBy(
                 (
                 count($column->getJoinWith()) ?
-                    $column->getJoinWith()[count($column->getJoinWith()) -1] :
+                    $column->getJoinWith()[count($column->getJoinWith()) - 1] :
                     ($column->getAlias() === null ? $columnDefaultAlias : $column->getAlias())
                 )
                 . '.' . $column->getName(),
@@ -142,7 +141,7 @@ class DQLConverter
         if (null !== $nqlQuery->getOffset()) {
             $query->setFirstResult($nqlQuery->getOffset());
         }
-        
+
         return $query;
     }
 
@@ -232,18 +231,19 @@ class DQLConverter
         foreach ($conditions as $cond) {
             switch ($cond->type) {
                 case WherePartType::OPERATOR:
-                    $whereClause .= ' '.$cond->value;
+                    $whereClause .= ' ' . $cond->value;
                     break;
                 case WherePartType::CONDITION:
                     $whereClause .=
-                        ' '.(!count($cond->key->getJoinWith()) ?
+                        ' ' . ($cond->key->getWrappingFunction() === null ? '' : $cond->key->getWrappingFunction() . '(') .
+                        (!count($cond->key->getJoinWith()) ?
                             ($cond->key->getAlias() ?? $columnDefaultAlias) :
-                            $cond->key->getJoinWith()[count($cond->key->getJoinWith())-1]).
-                        '.'.$cond->key->getName().' '.
-                        ($cond->operator === '!=' ?'<>' : $cond->operator).
-                        ' ?'.$paramCounter
-                    ;
-                    if($cond->operator === Operator::LIKE && !StringUtils::startsWith($cond->value, '%') && !StringUtils::endsWith($cond->value, '%')) {
+                            $cond->key->getJoinWith()[count($cond->key->getJoinWith()) - 1]) .
+                        '.' . $cond->key->getName() . ' ' .
+                        ($cond->key->getWrappingFunction() === null ? '' : ')') .
+                        ($cond->operator === '!=' ? '<>' : $cond->operator) .
+                        ' ?' . $paramCounter;
+                    if ($cond->operator === Operator::LIKE && !StringUtils::startsWith($cond->value, '%') && !StringUtils::endsWith($cond->value, '%')) {
                         $whereParams[] = '%' . $cond->value . '%';
                     } else {
                         $whereParams[] = $cond->value;
@@ -259,7 +259,7 @@ class DQLConverter
                     $subWhereClause = $parametrizedSubWhere['clause'];
                     $subWhereParams = $parametrizedSubWhere['params'];
 
-                    $whereClause .= ' ('.$subWhereClause.')';
+                    $whereClause .= ' (' . $subWhereClause . ')';
                     $whereParams = array_merge($whereParams, $subWhereParams);
                     break;
             }
