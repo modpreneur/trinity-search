@@ -25,7 +25,7 @@ use Trinity\Bundle\SearchBundle\Utils\StringUtils;
 class DefaultController extends FOSRestController
 {
     /**
-     * @Get("/{tableName}/")
+     * @Get("/{tableName}/", name="trinity_table_search")
      *
      * @QueryParam(name="q", nullable=false, strict=true, description="DB Query", allowBlank=true)
      *
