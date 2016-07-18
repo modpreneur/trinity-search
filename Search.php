@@ -63,7 +63,8 @@ final class Search
         $namespace,
         ContainerInterface $container,
         $detailUrlProviderServiceName
-    ) {
+    )
+    {
         $this->dqlConverter = $dqlConverter;
         $this->em = $em;
         $this->namespace = $namespace;
@@ -152,27 +153,8 @@ final class Search
         $limit = null,
         $offset = null,
         $orderBy = null
-    ) {
-        /*
-         * @TODO @MartinMatejka this should manage compatibility with elasticsearch,
-         * if doesnt needed in SQL dont lower
-         */
-        if ($str) {
-            $entityName = strtolower($entityName);
-        }
-    public function queryEntity(
-        $entityName,
-        $queryColumns,
-        $entityClass,
-        $str,
-        $limit = null,
-        $offset = null,
-        $orderBy = null
-    ) {
-            /*
-             * @TODO @MartinMatejka this should manage compatibility with elasticsearch,
-             * if doesnt needed in SQL dont lower
-             */
+    )
+    {
         if ($str) {
             $entityName = strtolower($entityName);
         }
