@@ -35,24 +35,22 @@ final class Search
 {
     /** @var DQLConverter */
     private $dqlConverter;
-
     /** @var EntityManager */
     private $em;
-
     /** @var string */
     private $namespace;
-
     /** @var DetailUrlProvider */
     private $detailUrlProvider;
 
-
     /**
      * Search constructor.p
+     *
      * @param EntityManager $em
      * @param DQLConverter $dqlConverter
      * @param string $namespace
      * @param ContainerInterface $container
      * @param string $detailUrlProviderServiceName
+     *
      * @internal param $detailUrlProvider
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
@@ -63,18 +61,17 @@ final class Search
         $namespace,
         ContainerInterface $container,
         $detailUrlProviderServiceName
-    )
-    {
+    ) {
         $this->dqlConverter = $dqlConverter;
         $this->em = $em;
         $this->namespace = $namespace;
         $this->detailUrlProvider = $container->get($detailUrlProviderServiceName);
     }
 
-
     /**
      * @param string $tableName
      * @param string $queryParams
+     *
      * @return NQLQuery
      * @throws \Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException
      * @throws NotFoundHttpException
@@ -90,10 +87,10 @@ final class Search
         return $this->query($query);
     }
 
-
     /**
      * @param string $str
      * @param bool $addDetailUrls
+     *
      * @return array
      */
     public function queryGlobal($str, $addDetailUrls = true) : array
@@ -140,6 +137,7 @@ final class Search
      * @param null|string $limit
      * @param null|string $offset
      * @param null|string $orderBy
+     *
      * @return NQLQuery | null
      * @throws \Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
@@ -153,8 +151,7 @@ final class Search
         $limit = null,
         $offset = null,
         $orderBy = null
-    )
-    {
+    ) {
         if ($str) {
             $entityName = strtolower($entityName);
         }
@@ -205,9 +202,9 @@ final class Search
         return $this->queryTable($entityName, $query);
     }
 
-
     /**
      * @param $query
+     *
      * @return NQLQuery
      * @throws Exception\SyntaxErrorException
      */
@@ -221,6 +218,7 @@ final class Search
     /**
      * @param string $message
      * @param \Exception|null $previous
+     *
      * @return NotFoundHttpException
      */
     private static function createNotFoundException($message = 'Not Found', \Exception $previous = null)
@@ -232,6 +230,7 @@ final class Search
     /**
      * @param object $entity
      * @param string $value
+     *
      * @return array|mixed|string
      */
     public static function getValue($entity, $value)
@@ -246,6 +245,7 @@ final class Search
      * @param object $entity
      * @param string[] $values
      * @param int $curValueIndex
+     *
      * @return array|mixed|string
      */
     private static function getObject($entity, $values, $curValueIndex)
@@ -284,10 +284,10 @@ final class Search
 
     }
 
-
     /**
      * @param NQLQuery $nqlQuery
      * @param bool $skipSelection
+     *
      * @return mixed|string
      * @throws \Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException
      */
@@ -317,9 +317,9 @@ final class Search
         )->build()->serialize($result, 'json', $context);
     }
 
-
     /**
      * @param array $entities
+     *
      * @return mixed|string
      */
     public function convertArrayToJson(array $entities)
@@ -340,6 +340,7 @@ final class Search
     /**
      * @param  Column[] $columns
      * @param  object $entity
+     *
      * @return array
      */
     private function select($columns, $entity) : array
@@ -364,9 +365,9 @@ final class Search
         return $attributes;
     }
 
-
     /**
      * @param $entityName
+     *
      * @return array Entity class name, null if not found
      * @throws \Doctrine\ORM\ORMException
      * @internal param string $table Table name
@@ -423,6 +424,7 @@ final class Search
 
     /**
      * @param \ReflectionClass $reflectionClass
+     *
      * @return \ReflectionProperty[]
      */
     private function getClassProperties($reflectionClass)
