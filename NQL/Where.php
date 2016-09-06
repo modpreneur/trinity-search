@@ -227,9 +227,13 @@ class Where
      * @param array $newColumnNames
      * @param string $joiningOperator
      */
-    public function replaceColumn($oldColumnName, array $newColumnNames, $joiningOperator = Operator:: OR, /** @noinspection ParameterByRefWithDefaultInspection */
-                                  &$whereParts = null)
-    {
+    public function replaceColumn(
+        $oldColumnName,
+        array $newColumnNames,
+        $joiningOperator = Operator:: OR,
+        /** @noinspection ParameterByRefWithDefaultInspection */
+        &$whereParts = null
+    ) {
         if ($whereParts === null) {
             $whereParts = &$this->conditions;
         }
@@ -260,7 +264,8 @@ class Where
                             // Create and add condition into subcondition
                             $newInnerWherePart = new WherePart();
                             $newInnerWherePart->type = WherePartType::CONDITION;
-                            $newInnerWherePart->key = new Column($newColumnName, $column->getAlias(), $column->getWrappingFunction(), $column->getJoinWith());
+                            $newInnerWherePart->key = new Column($newColumnName, $column->getAlias(),
+                                $column->getWrappingFunction(), $column->getJoinWith());
                             $newInnerWherePart->value = $wherePart->value;
                             $newInnerWherePart->operator = $wherePart->operator;
 
@@ -289,5 +294,42 @@ class Where
                 }
             }
         }
+    }
+
+    /**
+     * @param $columnName
+     * @param $modifier
+     * @param null $whereParts
+     */
+    public function modifyCondition(
+        $columnName,
+        $modifier,
+        /** @noinspection ParameterByRefWithDefaultInspection */
+        &$whereParts = null
+    ) {
+        if ($modifier === null || !is_callable($modifier)) {
+            return;
+        }
+
+        if ($whereParts === null) {
+            /** @noinspection CallableParameterUseCaseInTypeContextInspection */
+            $whereParts = &$this->conditions;
+        }
+
+        $partsCount = count($whereParts);
+
+        /** @noinspection ForeachInvariantsInspection */
+        for ($i = 0; $i < $partsCount; $i++) {
+            $wherePart = $whereParts[$i];
+
+            if ($wherePart->type === WherePartType::CONDITION && $wherePart->key->getName() === $columnName) {
+                $modifier($wherePart);
+
+            } else if ($wherePart->type === WherePartType::SUBCONDITION) {
+                $this->modifyCondition($columnName, $modifier, $wherePart->subTree);
+            }
+        }
+
+
     }
 }
