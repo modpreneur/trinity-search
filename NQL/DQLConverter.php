@@ -250,7 +250,7 @@ class DQLConverter
                     // Operator + value part
                     // check for null
                     $value = $cond->value;
-                    if ($value === null || $value === '' || strtolower($value) === 'null') {
+                    if ($value === null || $value === '<NULL>') {
                         $whereClause .= 'IS NULL';
                         break;
                     }
