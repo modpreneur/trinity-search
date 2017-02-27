@@ -234,16 +234,38 @@ class DQLConverter
                     $whereClause .= ' ' . $cond->value;
                     break;
                 case WherePartType::CONDITION:
+
+                    $wrappingFunction = $cond->key->getWrappingFunction();
+                    $isWrappingFunction = $wrappingFunction === null;
+
+                    // Name part
                     $whereClause .=
-                        ' ' . ($cond->key->getWrappingFunction() === null ? '' : $cond->key->getWrappingFunction() . '(') .
+                        ' ' . ($isWrappingFunction ? '' : $wrappingFunction . '(') .
                         (!count($cond->key->getJoinWith()) ?
                             ($cond->key->getAlias() ?? $columnDefaultAlias) :
                             $cond->key->getJoinWith()[count($cond->key->getJoinWith()) - 1]) .
                         '.' . $cond->key->getName() . ' ' .
-                        ($cond->key->getWrappingFunction() === null ? '' : ')') .
+                        ($isWrappingFunction ? '' : $wrappingFunction . ')');
+
+                    // Operator + value part
+                    // check for null
+                    $value = $cond->value;
+                    if ($value === null || $value === '' || strtolower($value) === 'null') {
+                        $whereClause .= 'IS NULL';
+                        break;
+                    }
+
+                    // else continue normally
+                    $whereClause .=
                         ($cond->operator === '!=' ? '<>' : $cond->operator) .
                         ' ?' . $paramCounter;
-                    if ($cond->operator === Operator::LIKE && !StringUtils::startsWith($cond->value, '%') && !StringUtils::endsWith($cond->value, '%')) {
+
+                    // Like operator check
+                    if (
+                        $cond->operator === Operator::LIKE
+                        && !StringUtils::startsWith($cond->value, '%')
+                        && !StringUtils::endsWith($cond->value, '%')
+                    ) {
                         $whereParams[] = '%' . $cond->value . '%';
                     } else {
                         $whereParams[] = $cond->value;
