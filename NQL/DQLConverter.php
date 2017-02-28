@@ -244,8 +244,7 @@ class DQLConverter
                         (!count($cond->key->getJoinWith()) ?
                             ($cond->key->getAlias() ?? $columnDefaultAlias) :
                             $cond->key->getJoinWith()[count($cond->key->getJoinWith()) - 1]) .
-                        '.' . $cond->key->getName() . ' ' .
-                        ($isWrappingFunction ? '' : $wrappingFunction . ')');
+                        '.' . $cond->key->getName() . ($isWrappingFunction ? '' : ')') . ' ';
 
                     // Operator + value part
                     // check for null
