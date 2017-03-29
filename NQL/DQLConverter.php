@@ -70,6 +70,8 @@ class DQLConverter
 
         if ($columnDefaultAlias === 'group') {
             $columnDefaultAlias = '_group';
+        } elseif ($columnDefaultAlias === 'order') {
+            $columnDefaultAlias = '_order';
         }
 
         if ($skipSelection) {
