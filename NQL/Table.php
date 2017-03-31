@@ -33,6 +33,8 @@ class Table
         $this->alias = null === $alias ? $this->getDefaultAlias() : $alias;
         if ($this->alias === 'group') {
             $this->alias = '_group';
+        } elseif ($this->alias === 'order') {
+            $this->alias = '_order';
         }
     }
 
