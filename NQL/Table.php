@@ -25,12 +25,14 @@ class Table
      * @param string $name
      * @param null | string $alias
      */
-    public function __construct($prefix, $name, $alias = null)
+    public function __construct(string $prefix, string $name, ?string $alias = null)
     {
         $this->prefix = $prefix;
         $this->name = $name;
 
-        $this->alias = null === $alias ? $this->getDefaultAlias() : $alias;
+        $this->alias = $alias ?? $this->getDefaultAlias();
+
+        // Special cases
         if ($this->alias === 'group') {
             $this->alias = '_group';
         } elseif ($this->alias === 'order') {
@@ -41,7 +43,7 @@ class Table
     /**
      * @return string
      */
-    private function getDefaultAlias()
+    private function getDefaultAlias(): string
     {
         return strtolower($this->name);
     }
@@ -50,7 +52,7 @@ class Table
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -59,7 +61,7 @@ class Table
     /**
      * @return string
      */
-    public function getPrefix()
+    public function getPrefix(): string
     {
         return $this->prefix;
     }
@@ -68,7 +70,7 @@ class Table
     /**
      * @return string|null
      */
-    public function getAlias()
+    public function getAlias(): string
     {
         return $this->alias;
     }
