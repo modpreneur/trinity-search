@@ -1,4 +1,4 @@
-FROM modpreneur/trinity-test:alpine
+FROM modpreneur/trinity-test
 
 MAINTAINER Barbora Čápová <capova@modpreneur.com>
 

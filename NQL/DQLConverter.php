@@ -111,7 +111,7 @@ class DQLConverter
                 for ($i = 0; $i < $iMax; $i++) {
                     if (!array_key_exists($joinWith[$i], $alreadyJoined)) {
                         if ($i === 0) {
-                            $column = ($column->getAlias() === null ? $columnDefaultAlias : $column->getAlias()) . '.' . $column->getJoinWith()[$i];
+                            $column = ($column->getAlias() ?? $columnDefaultAlias) . '.' . $column->getJoinWith()[$i];
                         } else {
                             $column = $joinWith[$i - 1] . '.' . $joinWith[$i];
                         }
@@ -129,7 +129,7 @@ class DQLConverter
                 (
                 count($column->getJoinWith()) ?
                     $column->getJoinWith()[count($column->getJoinWith()) - 1] :
-                    ($column->getAlias() === null ? $columnDefaultAlias : $column->getAlias())
+                    ($column->getAlias() ?? $columnDefaultAlias)
                 )
                 . '.' . $column->getName(),
                 $column->getOrdering()
@@ -152,7 +152,7 @@ class DQLConverter
      * @param QueryBuilder $query
      * @return QueryBuilder
      */
-    public function convertToCount(QueryBuilder $query)
+    public function convertToCount(QueryBuilder $query): QueryBuilder
     {
         $selects = $query->getDQLPart('select');
 
@@ -179,7 +179,7 @@ class DQLConverter
      * @param From $from
      * @throws SyntaxErrorException
      */
-    private function checkTables(From $from)
+    private function checkTables(From $from): void
     {
         $tables = $from->getTables();
 
@@ -191,7 +191,7 @@ class DQLConverter
     }
 
 
-    private function fetchAvailableEntities()
+    private function fetchAvailableEntities(): void
     {
         $this->entities = [];
         $meta = $this->em->getMetadataFactory()->getAllMetadata();
@@ -225,7 +225,7 @@ class DQLConverter
      * @param int $paramCounter
      * @return array
      */
-    private function getParametrizedWhere($conditions, $columnDefaultAlias = '', &$paramCounter = 0) : array
+    private function getParametrizedWhere($conditions, string $columnDefaultAlias = '', &$paramCounter = 0) : array
     {
         $whereClause = '';
         $whereParams = [];
@@ -321,7 +321,7 @@ class DQLConverter
      * @param $conditions
      * @return Column[]
      */
-    private function getAllColumnsFromWhere($conditions) : array
+    private function getAllColumnsFromWhere(array $conditions) : array
     {
         $columns = [];
 

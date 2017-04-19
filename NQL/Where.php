@@ -264,8 +264,13 @@ class Where
                             // Create and add condition into subcondition
                             $newInnerWherePart = new WherePart();
                             $newInnerWherePart->type = WherePartType::CONDITION;
-                            $newInnerWherePart->key = new Column($newColumnName, $column->getAlias(),
-                                $column->getWrappingFunction(), $column->getJoinWith());
+                            $newInnerWherePart->key = new Column(
+                                $newColumnName,
+                                $column->getAlias(),
+                                $column->getWrappingFunction(),
+                                $column->getJoinWith()
+                            );
+
                             $newInnerWherePart->value = $wherePart->value;
                             $newInnerWherePart->operator = $wherePart->operator;
 

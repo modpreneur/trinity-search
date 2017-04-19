@@ -26,9 +26,9 @@ class Operator
 
     /**
      * Operator constructor.
-     * @param null $operator
+     * @param string $operator
      */
-    public function __construct($operator = null)
+    public function __construct(?string $operator = self::EQ)
     {
         $this->value = $operator;
         if ($operator === null) {
@@ -45,8 +45,7 @@ class Operator
     {
         if ($operator instanceof Operator) {
             return $operator->value === $this->value;
-        } else {
-            return $operator === $this->value;
         }
+        return $operator === $this->value;
     }
 }

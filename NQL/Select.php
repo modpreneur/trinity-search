@@ -31,7 +31,7 @@ class Select
      * @return Select
      * @throws SyntaxErrorException
      */
-    public static function parse($str = '') : Select
+    public static function parse(string $str = '') : Select
     {
         $selection = new Select();
 
@@ -40,6 +40,7 @@ class Select
         foreach ($columns as &$column) {
             $column = Column::parse($column);
         }
+        unset($column);
 
         $selection->columns = $columns;
 
