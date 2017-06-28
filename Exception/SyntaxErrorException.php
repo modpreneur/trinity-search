@@ -19,6 +19,6 @@ class SyntaxErrorException extends Exception
      */
     public function __construct($message = '')
     {
-        $this->message = 'Syntax error: ' . $message;
+        parent::__construct('Syntax error: ' . $message);
     }
 }

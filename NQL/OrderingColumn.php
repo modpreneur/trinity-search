@@ -18,7 +18,7 @@ class OrderingColumn extends Column
     /**
      * @return string
      */
-    public function getOrdering()
+    public function getOrdering(): string
     {
         return $this->ordering;
     }
@@ -27,7 +27,7 @@ class OrderingColumn extends Column
     /**
      * @param string $ordering
      */
-    public function setOrdering($ordering)
+    public function setOrdering($ordering): void
     {
         $this->ordering = $ordering;
     }
@@ -52,7 +52,7 @@ class OrderingColumn extends Column
      * @param string $str
      * @param string $ordering
      * @param string|null $alias
-     * @return OrderingColumn
+     * @return Column
      * @throws \Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException
      */
     public static function parse(string $str, $alias = null, $ordering = 'ASC'): Column
@@ -67,7 +67,7 @@ class OrderingColumn extends Column
     /**
      * Flip ordering
      */
-    public function flipOrdering()
+    public function flipOrdering(): void
     {
         if ($this->ordering === 'ASC') {
             $this->ordering = 'DESC';

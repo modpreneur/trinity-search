@@ -58,7 +58,7 @@ class User
 
 
     /**
-     * @var UserGroup[]
+     * @var ArrayCollection
      *
      * @ORM\ManyToMany(targetEntity="UserGroup", inversedBy="users")
      * @ORM\JoinTable("user_group")
@@ -193,18 +193,18 @@ class User
 
 
     /**
-     * @return UserGroup[]
+     * @return ArrayCollection
      */
-    public function getGroups()
+    public function getGroups(): ArrayCollection
     {
         return $this->groups;
     }
 
 
     /**
-     * @param UserGroup[] $groups
+     * @param ArrayCollection $groups
      */
-    public function setGroups($groups)
+    public function setGroups($groups): void
     {
         $this->groups = $groups;
     }

@@ -1,7 +1,9 @@
-#!/bin/bash sh
+#!/bin/sh sh
 
 composer update
 
-./vendor/phpunit/phpunit/phpunit
+phpunit
 
-while true; do sleep 1000; done
+phpstan analyse Controller/ DataFixtures/ DependencyInjection/ Exception/ NQL/ Serialization/ Tests/ Utils/ --level=4
+
+tail -f /dev/null

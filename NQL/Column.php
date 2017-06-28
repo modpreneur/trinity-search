@@ -16,22 +16,33 @@ class Column
 {
     private static $regFuncColumn = '/(?J)(^((?P<function>\S+)\(((?P<alias>[^\s\.]+)\.)?((?P<joinWith>[^\s\.]+)\.)?(?P<column>\S+)\))$)|(^((?P<alias>[^\s\.]+)\.)?((?P<joinWith>[^\s\.]+):)?(?P<column>\S+)$)/';
 
+    /** @var string */
     private $name;
-    private $wrappingFunction;
+
+    /** @var string | null */
     private $alias;
+
+    /** @var string | null  */
+    private $wrappingFunction;
+
+    /** @var array | null */
     private $joinWith;
 
 
     /** @noinspection MoreThanThreeArgumentsInspection
-     * 
+     *
      * Column constructor.
-     * @param $name
-     * @param null $alias
-     * @param null $wrappingFunction
-     * @param null $joinWith
+     * @param string $name
+     * @param string|null $alias
+     * @param string|null $wrappingFunction
+     * @param array $joinWith
      */
-    public function __construct($name, $alias = null, $wrappingFunction = null, $joinWith = [])
-    {
+    public function __construct(
+        string $name,
+        ?string $alias = null,
+        ?string $wrappingFunction = null,
+        array $joinWith = []
+    ) {
         $this->name = $name;
         $this->wrappingFunction = StringUtils::isEmpty($wrappingFunction) ? null : $wrappingFunction;
         $this->alias = StringUtils::isEmpty($alias) ? null : $alias;

@@ -18,7 +18,9 @@ class Where
      * Regular expression to get key=value from condition
      * @var string
      */
-    private static $regKeyOpValue = '/^(?<key>[^\s<>=!]+)\s*(?<operator>(([<>!]?=|[<>]))|(LIKE))\s*(?<value>\"[^\.")]+\"|[^\s)]+)/';
+    private static $regKeyOpValue =
+        '/^(?<key>[^\s<>=!]+)\s*(?<operator>(([<>!]?=|[<>]))|(LIKE))\s*(?<value>\"[^\.")]+\"|[^\s)]+)/'
+    ;
 
     /**
      * @var WherePart[]
@@ -53,7 +55,7 @@ class Where
     /**
      * @param WherePart[] $conditions
      */
-    private function setConditions($conditions)
+    private function setConditions($conditions): void
     {
         $this->conditions = $conditions;
     }
@@ -94,14 +96,12 @@ class Where
 
                     $i = $pairBracketIndex;
                     continue;
-                } else {
-                    throw new SyntaxErrorException('Missing pair bracket');
                 }
-
+                throw new SyntaxErrorException('Missing pair bracket');
             } // IF THERE IS SPACE - IT IS SIGN THAT THERE WILL BE "AND" OR "OR" CONDITION
             else {
                 if ($str[$i] === ' ') {
-                    if (trim(substr($str, $i, 4)) === Operator:: AND) {
+                    if (trim(substr($str, $i, 4)) === Operator::AND) {
                         $part = new WherePart();
                         $part->type = WherePartType::OPERATOR;
                         $part->value = Operator:: AND;
@@ -109,10 +109,10 @@ class Where
                         $parts[] = $part;
                         $i += 3;
                     } else {
-                        if (trim(substr($str, $i, 3)) === Operator:: OR) {
+                        if (trim(substr($str, $i, 3)) === Operator::OR) {
                             $part = new WherePart();
                             $part->type = WherePartType::OPERATOR;
-                            $part->value = Operator:: OR;
+                            $part->value = Operator::OR;
 
                             $parts[] = $part;
                             $i += 2;
@@ -146,7 +146,10 @@ class Where
                         $context = self::getErrorContext($str, $i);
 
                         throw new SyntaxErrorException(
-                            "Unrecognized char sequence at '{$context['subString']}' starting from index {$context['errorAt']}"
+                            "
+                            Unrecognized char sequence at '{$context['subString']}' 
+                            starting from index {$context['errorAt']}
+                            "
                         );
                     }
 
@@ -230,10 +233,10 @@ class Where
     public function replaceColumn(
         $oldColumnName,
         array $newColumnNames,
-        $joiningOperator = Operator:: OR,
+        $joiningOperator = Operator::OR,
         /** @noinspection ParameterByRefWithDefaultInspection */
         &$whereParts = null
-    ) {
+    ): void {
         if ($whereParts === null) {
             $whereParts = &$this->conditions;
         }
@@ -246,7 +249,6 @@ class Where
             // Loop through all where parts
             /** @noinspection ForeachInvariantsInspection */
             for ($i = 0; $i < $partsCount; $i++) {
-
                 $wherePart = $whereParts[$i];
 
                 // Match column we are looking for
@@ -255,13 +257,13 @@ class Where
 
                     if ($newColumnNamesCount > 1) { // If column is being replaced by multiple ones
 
-                        // Create subcondition instead of original condition
+                        // Create sub-condition instead of original condition
                         $newWherePart = new WherePart();
                         $newWherePart->type = WherePartType::SUBCONDITION;
                         $newWherePart->subTree = [];
 
                         foreach ($newColumnNames as $j => $newColumnName) {
-                            // Create and add condition into subcondition
+                            // Create and add condition into sub-condition
                             $newInnerWherePart = new WherePart();
                             $newInnerWherePart->type = WherePartType::CONDITION;
                             $newInnerWherePart->key = new Column(
@@ -294,7 +296,7 @@ class Where
                         $column->setName($newColumnNames[0]);
                     }
 
-                } else if ($wherePart->type === WherePartType::SUBCONDITION) {
+                } elseif ($wherePart->type === WherePartType::SUBCONDITION) {
                     $this->replaceColumn($oldColumnName, $newColumnNames, $joiningOperator, $wherePart->subTree);
                 }
             }
@@ -311,7 +313,7 @@ class Where
         $modifier,
         /** @noinspection ParameterByRefWithDefaultInspection */
         &$whereParts = null
-    ) {
+    ): void {
         if ($modifier === null || !is_callable($modifier)) {
             return;
         }
@@ -330,11 +332,9 @@ class Where
             if ($wherePart->type === WherePartType::CONDITION && $wherePart->key->getName() === $columnName) {
                 $modifier($wherePart);
 
-            } else if ($wherePart->type === WherePartType::SUBCONDITION) {
+            } elseif ($wherePart->type === WherePartType::SUBCONDITION) {
                 $this->modifyCondition($columnName, $modifier, $wherePart->subTree);
             }
         }
-
-
     }
 }

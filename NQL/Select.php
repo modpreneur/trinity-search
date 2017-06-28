@@ -60,7 +60,7 @@ class Select
     /**
      * @return Column[]
      */
-    public function getColumns()
+    public function getColumns(): array
     {
         return $this->columns;
     }

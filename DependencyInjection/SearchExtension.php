@@ -18,10 +18,14 @@ use Symfony\Component\DependencyInjection\Loader;
 class SearchExtension extends Extension
 {
     /**
-     * {@inheritdoc}
-     * @throws \Exception
+     * Loads a specific configuration.
+     *
+     * @param array $configs An array of configuration values
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     *
+     * @throws \InvalidArgumentException When provided tag is not defined in this extension
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
 //        $configuration = new Configuration();
 //        $config = $this->processConfiguration($configuration, $configs);

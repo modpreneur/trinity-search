@@ -66,7 +66,8 @@ class DQLConverter
         $query = $this->em->createQueryBuilder();
 
         /** @var string $columnDefaultAlias */
-        $columnDefaultAlias = count($nqlQuery->getFrom()->getTables()) === 1 ? $nqlQuery->getFrom()->getTables()[0]->getAlias() : '';
+        $columnDefaultAlias =
+            count($nqlQuery->getFrom()->getTables()) === 1 ? $nqlQuery->getFrom()->getTables()[0]->getAlias() : '';
 
         if ($columnDefaultAlias === 'group') {
             $columnDefaultAlias = '_group';
@@ -236,7 +237,6 @@ class DQLConverter
                     $whereClause .= ' ' . $cond->value;
                     break;
                 case WherePartType::CONDITION:
-
                     $wrappingFunction = $cond->key->getWrappingFunction();
                     $isWrappingFunction = $wrappingFunction === null;
 
@@ -262,8 +262,7 @@ class DQLConverter
                         ' ?' . $paramCounter;
 
                     // Like operator check
-                    if (
-                        $cond->operator === Operator::LIKE
+                    if ($cond->operator === Operator::LIKE
                         && !StringUtils::startsWith($cond->value, '%')
                         && !StringUtils::endsWith($cond->value, '%')
                     ) {
@@ -283,7 +282,7 @@ class DQLConverter
                     $subWhereParams = $parametrizedSubWhere['params'];
 
                     $whereClause .= ' (' . $subWhereClause . ')';
-                    $whereParams = array_merge($whereParams, $subWhereParams);
+                    $whereParams = \array_merge($whereParams, $subWhereParams);
                     break;
             }
         }

@@ -151,7 +151,8 @@ final class Search
         $limit = null,
         $offset = null,
         $orderBy = null
-    ) {
+    ): ?NQL\NQLQuery
+    {
         if ($str) {
             $entityName = strtolower($entityName);
         }

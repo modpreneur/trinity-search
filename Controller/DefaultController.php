@@ -5,14 +5,12 @@
 
 namespace Trinity\Bundle\SearchBundle\Controller;
 
-use Doctrine\ORM\Query;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\View;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcher;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
 use Trinity\Bundle\SearchBundle\NQL\NQLQuery;
@@ -32,7 +30,8 @@ class DefaultController extends FOSRestController
      * @param ParamFetcher $paramFetcher
      * @param string $tableName
      *
-     * @return JsonResponse
+     * @return Response
+     * @throws \BadMethodCallException
      * @throws \Doctrine\ORM\ORMException
      *
      * @throws \Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException
@@ -42,7 +41,7 @@ class DefaultController extends FOSRestController
      *
      * @View
      */
-    public function tableAction(ParamFetcher $paramFetcher, $tableName)
+    public function tableAction(ParamFetcher $paramFetcher, $tableName): ?Response
     {
         $queryParams = $paramFetcher->get('q');
 
@@ -58,20 +57,33 @@ class DefaultController extends FOSRestController
                 200,
                 ['Content-Type' => 'application/json']
             );
-        } else {
-            try {
-                /** @var NQLQuery $nqlQuery */
-                $nqlQuery = $search->queryTable($tableName, $queryParams);
-                return new Response(
-                    $search->convertToJson($nqlQuery, count($nqlQuery->getSelect()->getColumns())),
-                    200,
-                    ['Content-Type' => 'application/json']
-                );
+        }
 
-            } catch (SyntaxErrorException $e) {
-                $result = $search->queryEntity($tableName, null, null, $queryParams)->getQueryBuilder()->getQuery()->getResult();
-                return new Response($search->convertArrayToJson($result));
+        try {
+            /** @var NQLQuery $nqlQuery */
+            $nqlQuery = $search->queryTable($tableName, $queryParams);
+            return new Response(
+                $search->convertToJson($nqlQuery, count($nqlQuery->getSelect()->getColumns())),
+                200,
+                ['Content-Type' => 'application/json']
+            );
+
+        } catch (SyntaxErrorException $e) {
+            $nqlQuery = $search->queryEntity(
+                $tableName,
+                null,
+                null,
+                $queryParams
+            );
+            if ($nqlQuery) {
+                $queryBuilder = $nqlQuery->getQueryBuilder();
+                if ($queryBuilder) {
+                    $result = $queryBuilder->getQuery()->getResult();
+                    return new Response($search->convertArrayToJson($result));
+                }
+                throw new \BadMethodCallException('QueryBuilder is null');
             }
+            throw new \BadMethodCallException('NQLQuery is null');
         }
     }
 }

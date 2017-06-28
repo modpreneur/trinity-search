@@ -46,7 +46,7 @@ class AppKernel extends Kernel
     /**
      * @return array
      */
-    public function registerBundles()
+    public function registerBundles(): array
     {
         return [
             new FrameworkBundle(),
@@ -64,7 +64,7 @@ class AppKernel extends Kernel
     /**
      * @param LoaderInterface $loader
      */
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load(__DIR__.'/config/config.yml');
         $loader->load(__DIR__.'/config/services.yml');
@@ -74,7 +74,7 @@ class AppKernel extends Kernel
     /**
      * @return string
      */
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
         return __DIR__.'/./cache';
     }
@@ -83,7 +83,7 @@ class AppKernel extends Kernel
     /**
      * @return string
      */
-    public function getLogDir()
+    public function getLogDir(): string
     {
         return __DIR__.'/./logs';
     }

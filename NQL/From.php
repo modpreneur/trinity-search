@@ -22,7 +22,7 @@ class From
     /**
      * @return Table[]
      */
-    public function getTables()
+    public function getTables(): array
     {
         return $this->tables;
     }
@@ -49,7 +49,7 @@ class From
                 $tables[] = new Table(
                     $match['prefix'],
                     $match['name'],
-                    array_key_exists('alias', $match) ? $match['alias'] : null
+                    $match['alias'] ?? null
                 );
             } else {
                 throw new SyntaxErrorException("Invalid column \"$tableStr\"");

@@ -97,7 +97,6 @@ class OrderBy
 
                 if ($column->getName() === $oldColumnName) {
                     if ($newColumnNamesCount > 1) {
-
                         $newColumns = [];
                         foreach ($newColumnNames as $j => $newColumnName) {
                             $newColumn = new OrderingColumn(

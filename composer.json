@@ -24,7 +24,7 @@
     "doctrine/orm": "~2.5",
     "doctrine/data-fixtures": "~1.1",
     "friendsofsymfony/rest-bundle": "~2.0",
-    "jms/serializer-bundle": "~1.1",
+    "jms/serializer-bundle": "~1.1 | ~2.0",
     "sensio/framework-extra-bundle": "~3.0",
     "trinity/utils": "dev-master"
   },
@@ -41,7 +41,8 @@
     "fzaninotto/faker": "~1.5",
     "knplabs/doctrine-behaviors": "~1.3",
     "phpunit/phpunit": "~5.0",
-    "satooshi/php-coveralls" : "~1.0"
+    "satooshi/php-coveralls" : "~1.0",
+    "phpstan/phpstan": "~0.7"
   },
 
   "autoload": {
