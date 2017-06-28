@@ -6,4 +6,4 @@ phpunit
 
 phpstan analyse Controller/ DataFixtures/ DependencyInjection/ Exception/ NQL/ Serialization/ Tests/ Utils/ --level=4
 
-tail -f /dev/null
+#tail -f /dev/null
