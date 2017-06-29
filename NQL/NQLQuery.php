@@ -5,6 +5,7 @@
 
 namespace Trinity\Bundle\SearchBundle\NQL;
 
+use Doctrine\ORM\QueryBuilder;
 use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
 
 /**
@@ -13,7 +14,9 @@ use Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException;
  */
 class NQLQuery
 {
-    private static $regSearchQuery = '/^SELECT\s(?<from>[^({\s]+)(\s(\((?<select>.*)\))?\s*({(?<where>.*)})?)?(\s((?i)LIMIT)\s*=\s*(?<limit>\d+)(\s((?i)OFFSET)\s*=\s*(?<offset>\d+))?)?(\s((?i)ORDERBY)\s(?<orderby>.+))?$/';
+    private static $regSearchQuery =
+        '/^SELECT\s(?<from>[^({\s]+)(\s(\((?<select>.*)\))?\s*({(?<where>.*)})?)?(\s((?i)LIMIT)\s*=\s*(?<limit>\d+)(\s((?i)OFFSET)\s*=\s*(?<offset>\d+))?)?(\s((?i)ORDERBY)\s(?<orderby>.+))?$/'
+    ;
 
     private $select;
     private $from;
@@ -41,7 +44,7 @@ class NQLQuery
      * @return NQLQuery
      * @throws SyntaxErrorException
      */
-    public static function parse($str) : NQLQuery
+    public static function parse(string $str) : NQLQuery
     {
         /** @var NQLQuery $query */
         $query = new NQLQuery();
@@ -89,7 +92,7 @@ class NQLQuery
     /**
      * @return Select
      */
-    public function getSelect()
+    public function getSelect(): Select
     {
         return $this->select;
     }
@@ -98,7 +101,7 @@ class NQLQuery
     /**
      * @return From
      */
-    public function getFrom()
+    public function getFrom(): ?From
     {
         return $this->from;
     }
@@ -107,7 +110,7 @@ class NQLQuery
     /**
      * @return Where
      */
-    public function getWhere()
+    public function getWhere(): ?Where
     {
         return $this->where;
     }
@@ -116,7 +119,7 @@ class NQLQuery
     /**
      * @return int|null
      */
-    public function getLimit()
+    public function getLimit(): ?int
     {
         return $this->limit;
     }
@@ -125,7 +128,7 @@ class NQLQuery
     /**
      * @return int|null
      */
-    public function getOffset()
+    public function getOffset(): ?int
     {
         return $this->offset;
     }
@@ -134,7 +137,7 @@ class NQLQuery
     /**
      * @return OrderBy
      */
-    public function getOrderBy()
+    public function getOrderBy(): ?OrderBy
     {
         return $this->orderBy;
     }
@@ -145,19 +148,18 @@ class NQLQuery
      * @return \Doctrine\ORM\QueryBuilder|null
      * @throws \Trinity\Bundle\SearchBundle\Exception\SyntaxErrorException
      */
-    public function getQueryBuilder($skipSelection = false)
+    public function getQueryBuilder(bool $skipSelection = false): ?QueryBuilder
     {
         if (null !== $this->dqlConverter) {
             return $this->dqlConverter->convert($this, $skipSelection);
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**
      * @param DQLConverter $converter
      */
-    public function setDqlConverter(DQLConverter $converter)
+    public function setDqlConverter(DQLConverter $converter): void
     {
         $this->dqlConverter = $converter;
     }

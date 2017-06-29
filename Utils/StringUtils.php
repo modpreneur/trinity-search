@@ -19,7 +19,7 @@ final class StringUtils
      *
      * @return bool
      */
-    public static function isEmpty($str) : bool
+    public static function isEmpty(?string $str) : bool
     {
         return (self::EMPTY_STR === $str) || (null === $str);
     }
@@ -30,7 +30,7 @@ final class StringUtils
      *
      * @return int
      */
-    public static function length($str) : int
+    public static function length(string $str) : int
     {
         return \strlen($str);
     }
@@ -42,7 +42,7 @@ final class StringUtils
      * @param null|int $end
      * @return string
      */
-    public static function substring($str, $start, $end = null) : string
+    public static function substring(string $str, int $start, ?int $end = null) : string
     {
         if ((0 > $start) && (0 < $end)) {
             $start = 0;
@@ -59,11 +59,11 @@ final class StringUtils
      * @param string $prefix
      * @return bool
      */
-    public static function startsWith($str, $prefix) : bool
+    public static function startsWith(?string $str, ?string $prefix) : bool
     {
-        return ((null === $str) && (null === $prefix)) ?
-            true :
-            self::substring($str, 0, self::length($prefix)) === $prefix;
+        return ((null === $str) && (null === $prefix))
+            ?: (bool)(self::substring($str, 0, self::length($prefix)) === $prefix)
+        ;
     }
 
 
@@ -72,11 +72,11 @@ final class StringUtils
      * @param string $suffix
      * @return bool
      */
-    public static function endsWith($str, $suffix) : bool
+    public static function endsWith(?string $str, ?string $suffix) : bool
     {
         return ((null === $str) && (null === $suffix))
-            ? true
-            : self::substring($str, self::length($str) - self::length($suffix)) === $suffix;
+            ?: (bool)(self::substring($str, self::length($str) - self::length($suffix)) === $suffix)
+        ;
     }
 
 
@@ -85,7 +85,7 @@ final class StringUtils
      * @param string $remove
      * @return string
      */
-    public static function removeStart($str, $remove)
+    public static function removeStart(?string $str, ?string $remove): string
     {
         if ((true === self::isEmpty($str)) || (true === self::isEmpty($remove))) {
             return $str;
@@ -148,10 +148,10 @@ final class StringUtils
 
     /**
      * Trim array of strings
-     * @param $array
+     * @param array $array
      * @return array
      */
-    public static function trimStringArray($array)
+    public static function trimStringArray(array $array): array
     {
         foreach ($array as &$item) {
             $item = trim($item);

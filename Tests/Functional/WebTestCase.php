@@ -11,6 +11,7 @@ use JMS\Serializer\SerializerBuilder;
 use Symfony\Bundle\FrameworkBundle\Console\Application as App;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\HttpFoundation\Response;
+use Trinity\Bundle\SearchBundle\NQL\NQLQuery;
 use Trinity\Bundle\SearchBundle\PassThroughNamingStrategy;
 use Trinity\Bundle\SearchBundle\Search;
 use Trinity\Bundle\SearchBundle\Tests\TestCase;
@@ -121,10 +122,12 @@ class WebTestCase extends TestCase
                 throw new \InvalidArgumentException('Query is empty');
             }
             return $search->convertArrayToJson($search->queryGlobal($queryParams));
-        } else {
-            $nqlQuery = $search->queryTable($tableName, $queryParams);
-            return $search->convertToJson($nqlQuery, count($nqlQuery->getSelect()->getColumns()));
         }
+
+        // Other tables
+        /**  @var NQLQuery */
+        $nqlQuery = $search->queryTable($tableName, $queryParams);
+        return $search->convertToJson($nqlQuery, count($nqlQuery->getSelect()->getColumns()));
     }
 
 

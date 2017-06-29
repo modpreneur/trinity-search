@@ -1,13 +1,7 @@
-FROM modpreneur/trinity-test:alpine
+FROM modpreneur/trinity-test
 
-MAINTAINER Barbora Čápová <capova@modpreneur.com>
-
-# Install app
-ADD . /var/app
+MAINTAINER Martin Kolek <kolek@modpreneur.com>
 
 WORKDIR /var/app
 
-
-RUN chmod +x entrypoint.sh
-
-ENTRYPOINT ["sh", "entrypoint.sh", "service postfix start"]
+ENTRYPOINT ["fish", "entrypoint.sh"]

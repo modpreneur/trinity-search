@@ -23,7 +23,7 @@ class OrderBy
     /**
      * @return OrderingColumn[]
      */
-    public function getColumns()
+    public function getColumns(): array
     {
         return $this->columns;
     }
@@ -31,24 +31,17 @@ class OrderBy
     /**
      * @param OrderingColumn[] $columns
      */
-    private function setColumns($columns)
+    private function setColumns(array $columns): void
     {
         $this->columns = $columns;
     }
-
-//    public function setDefaultColumnAlias($alias) {
-//        foreach($this->columns as $column) {
-//            if(is_null($column->getAlias()))
-//                $column->setAlias($alias);
-//        }
-//    }
 
     /**
      * @param string $str
      * @return OrderBy
      * @throws SyntaxErrorException
      */
-    public static function parse($str) : OrderBy
+    public static function parse(string $str) : OrderBy
     {
         /** @var OrderBy $orderBy */
         $orderBy = new OrderBy();
@@ -69,7 +62,7 @@ class OrderBy
             if (strcasecmp($ordering, 'ASC') !== 0 && strcasecmp($ordering, 'DESC') !== 0) {
                 throw new SyntaxErrorException('Unknown order by direction');
             }
-            $column = OrderingColumn::parse($col, $ordering);
+            $column = OrderingColumn::parse($col, null, $ordering);
             $columns[] = $column;
         }
 
@@ -81,7 +74,7 @@ class OrderBy
     /**
      * @return OrderBy
      */
-    public static function getBlank()
+    public static function getBlank(): OrderBy
     {
         return new OrderBy();
     }
@@ -91,7 +84,7 @@ class OrderBy
      * @param string[] $newColumnNames
      * @param array $flipSortOrders
      */
-    public function replaceColumn($oldColumnName, array $newColumnNames, array $flipSortOrders = [])
+    public function replaceColumn($oldColumnName, array $newColumnNames, array $flipSortOrders = []): void
     {
         $newColumnNamesCount = count($newColumnNames);
 
@@ -104,10 +97,14 @@ class OrderBy
 
                 if ($column->getName() === $oldColumnName) {
                     if ($newColumnNamesCount > 1) {
-
                         $newColumns = [];
                         foreach ($newColumnNames as $j => $newColumnName) {
-                            $newColumn = new OrderingColumn($newColumnName, $column->getAlias(), $column->getWrappingFunction(), $column->getJoinWith());
+                            $newColumn = new OrderingColumn(
+                                $newColumnName,
+                                $column->getAlias(),
+                                $column->getWrappingFunction(),
+                                $column->getJoinWith()
+                            );
                             $newColumn->setOrdering($column->getOrdering());
 
                             /** @noinspection NotOptimalIfConditionsInspection */

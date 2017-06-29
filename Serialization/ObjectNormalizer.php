@@ -39,10 +39,12 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
+
     /**
      * {@inheritdoc}
+     * @throws \ReflectionException
      */
-    protected function extractAttributes($object, $format = null, array $context = [])
+    protected function extractAttributes($object, $format = null, array $context = []): array
     {
         // If not using groups, detect manually
         $attributes = [];
@@ -101,32 +103,34 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             $property->setAccessible(true);
             $value = $property->getValue($object);
         } catch (\ReflectionException $e) {
-            
+            // @todo @MartinMatejka what here?
         }
 
         if ($value === null) {
             return null;
-        } else {
-            if (is_array($value)) {
-                return [];
-            } elseif (is_object($value)) {
-                if ($value instanceof \DateTime) {
-                    $value = $value->format('c');
-                } elseif ($value instanceof Selectable) {
-                    $value = [];
-                } else {
-                    $value = null;
-                }
-            }
-
-            return $value;
         }
+
+        if (is_array($value)) {
+            return [];
+        }
+
+        if (is_object($value)) {
+            if ($value instanceof \DateTime) {
+                $value = $value->format('c');
+            } elseif ($value instanceof Selectable) {
+                $value = [];
+            } else {
+                $value = null;
+            }
+        }
+
+        return $value;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
+    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = []): void
     {
         try {
             $this->propertyAccessor->setValue($object, $attribute, $value);

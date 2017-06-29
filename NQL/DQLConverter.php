@@ -66,10 +66,13 @@ class DQLConverter
         $query = $this->em->createQueryBuilder();
 
         /** @var string $columnDefaultAlias */
-        $columnDefaultAlias = count($nqlQuery->getFrom()->getTables()) === 1 ? $nqlQuery->getFrom()->getTables()[0]->getAlias() : '';
+        $columnDefaultAlias =
+            count($nqlQuery->getFrom()->getTables()) === 1 ? $nqlQuery->getFrom()->getTables()[0]->getAlias() : '';
 
         if ($columnDefaultAlias === 'group') {
             $columnDefaultAlias = '_group';
+        } elseif ($columnDefaultAlias === 'order') {
+            $columnDefaultAlias = '_order';
         }
 
         if ($skipSelection) {
@@ -109,7 +112,7 @@ class DQLConverter
                 for ($i = 0; $i < $iMax; $i++) {
                     if (!array_key_exists($joinWith[$i], $alreadyJoined)) {
                         if ($i === 0) {
-                            $column = ($column->getAlias() === null ? $columnDefaultAlias : $column->getAlias()) . '.' . $column->getJoinWith()[$i];
+                            $column = ($column->getAlias() ?? $columnDefaultAlias) . '.' . $column->getJoinWith()[$i];
                         } else {
                             $column = $joinWith[$i - 1] . '.' . $joinWith[$i];
                         }
@@ -127,7 +130,7 @@ class DQLConverter
                 (
                 count($column->getJoinWith()) ?
                     $column->getJoinWith()[count($column->getJoinWith()) - 1] :
-                    ($column->getAlias() === null ? $columnDefaultAlias : $column->getAlias())
+                    ($column->getAlias() ?? $columnDefaultAlias)
                 )
                 . '.' . $column->getName(),
                 $column->getOrdering()
@@ -150,7 +153,7 @@ class DQLConverter
      * @param QueryBuilder $query
      * @return QueryBuilder
      */
-    public function convertToCount(QueryBuilder $query)
+    public function convertToCount(QueryBuilder $query): QueryBuilder
     {
         $selects = $query->getDQLPart('select');
 
@@ -177,7 +180,7 @@ class DQLConverter
      * @param From $from
      * @throws SyntaxErrorException
      */
-    private function checkTables(From $from)
+    private function checkTables(From $from): void
     {
         $tables = $from->getTables();
 
@@ -189,7 +192,7 @@ class DQLConverter
     }
 
 
-    private function fetchAvailableEntities()
+    private function fetchAvailableEntities(): void
     {
         $this->entities = [];
         $meta = $this->em->getMetadataFactory()->getAllMetadata();
@@ -223,7 +226,7 @@ class DQLConverter
      * @param int $paramCounter
      * @return array
      */
-    private function getParametrizedWhere($conditions, $columnDefaultAlias = '', &$paramCounter = 0) : array
+    private function getParametrizedWhere($conditions, string $columnDefaultAlias = '', &$paramCounter = 0) : array
     {
         $whereClause = '';
         $whereParams = [];
@@ -234,16 +237,35 @@ class DQLConverter
                     $whereClause .= ' ' . $cond->value;
                     break;
                 case WherePartType::CONDITION:
+                    $wrappingFunction = $cond->key->getWrappingFunction();
+                    $isWrappingFunction = $wrappingFunction === null;
+
+                    // Name part
                     $whereClause .=
-                        ' ' . ($cond->key->getWrappingFunction() === null ? '' : $cond->key->getWrappingFunction() . '(') .
+                        ' ' . ($isWrappingFunction ? '' : $wrappingFunction . '(') .
                         (!count($cond->key->getJoinWith()) ?
                             ($cond->key->getAlias() ?? $columnDefaultAlias) :
                             $cond->key->getJoinWith()[count($cond->key->getJoinWith()) - 1]) .
-                        '.' . $cond->key->getName() . ' ' .
-                        ($cond->key->getWrappingFunction() === null ? '' : ')') .
+                        '.' . $cond->key->getName() . ($isWrappingFunction ? '' : ')') . ' ';
+
+                    // Operator + value part
+                    // check for null
+                    $value = $cond->value;
+                    if ($value === null || $value === '<NULL>') {
+                        $whereClause .= 'IS NULL';
+                        break;
+                    }
+
+                    // else continue normally
+                    $whereClause .=
                         ($cond->operator === '!=' ? '<>' : $cond->operator) .
                         ' ?' . $paramCounter;
-                    if ($cond->operator === Operator::LIKE && !StringUtils::startsWith($cond->value, '%') && !StringUtils::endsWith($cond->value, '%')) {
+
+                    // Like operator check
+                    if ($cond->operator === Operator::LIKE
+                        && !StringUtils::startsWith($cond->value, '%')
+                        && !StringUtils::endsWith($cond->value, '%')
+                    ) {
                         $whereParams[] = '%' . $cond->value . '%';
                     } else {
                         $whereParams[] = $cond->value;
@@ -260,7 +282,7 @@ class DQLConverter
                     $subWhereParams = $parametrizedSubWhere['params'];
 
                     $whereClause .= ' (' . $subWhereClause . ')';
-                    $whereParams = array_merge($whereParams, $subWhereParams);
+                    $whereParams = \array_merge($whereParams, $subWhereParams);
                     break;
             }
         }
@@ -298,7 +320,7 @@ class DQLConverter
      * @param $conditions
      * @return Column[]
      */
-    private function getAllColumnsFromWhere($conditions) : array
+    private function getAllColumnsFromWhere(array $conditions) : array
     {
         $columns = [];
 

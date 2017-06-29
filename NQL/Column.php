@@ -16,26 +16,37 @@ class Column
 {
     private static $regFuncColumn = '/(?J)(^((?P<function>\S+)\(((?P<alias>[^\s\.]+)\.)?((?P<joinWith>[^\s\.]+)\.)?(?P<column>\S+)\))$)|(^((?P<alias>[^\s\.]+)\.)?((?P<joinWith>[^\s\.]+):)?(?P<column>\S+)$)/';
 
+    /** @var string */
     private $name;
-    private $wrappingFunction;
+
+    /** @var string | null */
     private $alias;
+
+    /** @var string | null  */
+    private $wrappingFunction;
+
+    /** @var array | null */
     private $joinWith;
 
 
     /** @noinspection MoreThanThreeArgumentsInspection
-     * 
+     *
      * Column constructor.
-     * @param $name
-     * @param null $alias
-     * @param null $wrappingFunction
-     * @param null $joinWith
+     * @param string $name
+     * @param string|null $alias
+     * @param string|null $wrappingFunction
+     * @param array $joinWith
      */
-    public function __construct($name, $alias = null, $wrappingFunction = null, $joinWith = null)
-    {
+    public function __construct(
+        string $name,
+        ?string $alias = null,
+        ?string $wrappingFunction = null,
+        array $joinWith = []
+    ) {
         $this->name = $name;
         $this->wrappingFunction = StringUtils::isEmpty($wrappingFunction) ? null : $wrappingFunction;
         $this->alias = StringUtils::isEmpty($alias) ? null : $alias;
-        $this->joinWith = StringUtils::isEmpty($joinWith) ? [] : $joinWith;
+        $this->joinWith = $joinWith;
     }
 
 
@@ -51,7 +62,7 @@ class Column
     /**
      * @return string|null
      */
-    public function getWrappingFunction()
+    public function getWrappingFunction(): ?string
     {
         return $this->wrappingFunction;
     }
@@ -59,7 +70,7 @@ class Column
     /**
      * @return string|null
      */
-    public function getAlias()
+    public function getAlias(): ?string
     {
         return $this->alias;
     }
@@ -68,7 +79,7 @@ class Column
     /**
      * @return string[]|null
      */
-    public function getJoinWith() : array
+    public function getJoinWith(): array
     {
         return $this->joinWith;
     }
@@ -77,7 +88,7 @@ class Column
     /**
      * @param string|null $alias
      */
-    public function setAlias($alias)
+    public function setAlias(?string $alias): void
     {
         $this->alias = $alias;
     }
@@ -86,16 +97,16 @@ class Column
     /**
      * @param string[]|null $joinWith
      */
-    public function setJoinWith($joinWith)
+    public function setJoinWith(?array $joinWith): void
     {
         $this->joinWith = $joinWith;
     }
 
 
     /**
-     * @param $name
+     * @param string $name
      */
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -112,7 +123,7 @@ class Column
     /**
      * @return string
      */
-    public function getFullName() : string
+    public function getFullName(): string
     {
         $fullName = $this->getName();
         $joinCount = count($this->joinWith);
@@ -131,12 +142,12 @@ class Column
 
     /**
      * Alias = null - parsed alias is used, otherwise parsed alias is used as join field
-     * @param $str
+     * @param string $str
      * @param null $alias
      * @return Column
      * @throws SyntaxErrorException
      */
-    public static function parse($str, $alias = null)
+    public static function parse(string $str, $alias = null): Column
     {
         $match = [];
         $column = trim($str);
@@ -144,7 +155,7 @@ class Column
 
         if ($wasFound) {
             $name = $match['column'];
-            $alias = null === $alias ? $match['alias'] : $alias;
+            $alias = $alias ?? $match['alias'];
             $function = $match['function'];
             
             /** @noinspection NestedTernaryOperatorInspection */
@@ -153,8 +164,9 @@ class Column
                     $match['alias'] :
                     StringUtils::isEmpty($match['joinWith']) ? [] : explode(':', $match['joinWith']);
             return new Column($name, $alias, $function, $joinWith);
-        } else {
-            throw new SyntaxErrorException("Invalid column name '$column'");
         }
+
+        // Invalid column name
+        throw new SyntaxErrorException("Invalid column name '$column'");
     }
 }

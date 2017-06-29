@@ -49,7 +49,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null): bool
     {
         return is_object($data) && !$data instanceof \Traversable;
     }
@@ -60,6 +60,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @throws CircularReferenceException
      * @throws \Symfony\Component\Serializer\Exception\LogicException
+     * @throws \Symfony\Component\Serializer\Exception\InvalidArgumentException
      */
     public function normalize($object, $format = null, array $context = [])
     {
@@ -124,7 +125,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @return string[]
      */
-    protected function getAttributes($object, $format = null, array $context = [])
+    protected function getAttributes($object, $format = null, array $context = []): array
     {
         $class = get_class($object);
         $key = $class.'-'.$context['cache_key'];
@@ -160,7 +161,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @return string[]
      */
-    abstract protected function extractAttributes($object, $format = null, array $context = []);
+    abstract protected function extractAttributes($object, $format = null, array $context = []): array;
 
 
     /**
@@ -179,16 +180,18 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null): bool
     {
         return class_exists($type);
     }
+
 
     /**
      * {@inheritdoc}
      * @throws \Symfony\Component\Serializer\Exception\RuntimeException
      * @throws \Symfony\Component\Serializer\Exception\LogicException
      * @throws \Symfony\Component\Serializer\Exception\UnexpectedValueException
+     * @throws \ReflectionException
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
@@ -233,21 +236,30 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * @param string|null $format
      * @param array       $context
      */
-    abstract protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array());
+    abstract protected function setAttributeValue(
+        $object,
+        $attribute,
+        $value,
+        $format = null,
+        array $context = []
+    ): void;
 
 
     /**
      * Should this attribute be normalized?
      *
-     * @param mixed  $object
+     * @param mixed $object
      * @param string $attributeName
-     * @param array  $context
+     * @param array $context
      *
      * @return bool
+     * @throws \Symfony\Component\Serializer\Exception\InvalidArgumentException
      */
-    protected function isAttributeToNormalize($object, $attributeName, &$context)
+    protected function isAttributeToNormalize($object, $attributeName, &$context): bool
     {
-        return !in_array($attributeName, $this->ignoredAttributes) && !$this->isMaxDepthReached(get_class($object), $attributeName, $context);
+        return !in_array($attributeName, $this->ignoredAttributes, true)
+            && !$this->isMaxDepthReached(get_class($object), $attributeName, $context)
+        ;
     }
 
 
@@ -325,7 +337,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @return array
      */
-    private function updateData(array $data, $attribute, $attributeValue)
+    private function updateData(array $data, $attribute, $attributeValue): array
     {
         if ($this->nameConverter) {
             $attribute = $this->nameConverter->normalize($attribute);
@@ -346,7 +358,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * @return bool
      * @throws \Symfony\Component\Serializer\Exception\InvalidArgumentException
      */
-    private function isMaxDepthReached($class, $attribute, array &$context)
+    private function isMaxDepthReached($class, $attribute, array &$context): bool
     {
         if (!$this->classMetadataFactory || !isset($context[static::ENABLE_MAX_DEPTH])) {
             return false;
