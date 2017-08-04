@@ -26,7 +26,7 @@
     "friendsofsymfony/rest-bundle": "~2.0",
     "jms/serializer-bundle": "~2.0",
     "sensio/framework-extra-bundle": "~3.0",
-    "trinity/utils": "dev-master"
+    "trinity/utils": "~1.0"
   },
 
   "require-dev": {
