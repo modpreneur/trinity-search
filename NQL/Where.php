@@ -19,7 +19,7 @@ class Where
      * @var string
      */
     private static $regKeyOpValue =
-        '/^(?<key>[^\s<>=!]+)\s*(?<operator>(([<>!]?=|[<>]))|(LIKE))\s*(?<value>\"[^\.")]+\"|[^\s)]+)/'
+          '/^(?<key>[^\s<>=!]+)\s*(?<operator>(([<>!]?=|[<>]))|(LIKE))\s*(?<value>\"([^"\\\\]|\\\\.)*\"|[^\s)]+)/'
     ;
 
     /**

@@ -266,9 +266,9 @@ class DQLConverter
                         && !StringUtils::startsWith($cond->value, '%')
                         && !StringUtils::endsWith($cond->value, '%')
                     ) {
-                        $whereParams[] = '%' . $cond->value . '%';
+                        $whereParams[] = '%' . str_replace('\"', '"', $cond->value) . '%';
                     } else {
-                        $whereParams[] = $cond->value;
+                        $whereParams[] = str_replace('\"', '"', $cond->value);
                     }
                     $paramCounter++;
                     break;

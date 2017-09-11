@@ -91,6 +91,21 @@ class DataSet
             $entityManager->persist($product);
         }
 
+        // add product with quoted word in name
+        $product = new Product();
+        $product->setName('Sample product with "quoted" word in name');
+        $entityManager->persist($product);
+
+        $product->setCreatedAt($faker->dateTime);
+        $product->setUpdatedAt($faker->dateTime);
+
+        $s = new Shipping();
+        $s->setPrice($faker->numberBetween(0, 500));
+        $entityManager->persist($s);
+
+        $product->setShipping($s);
+        $entityManager->persist($product);
+
         $entityManager->flush();
     }
 }
