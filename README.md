@@ -26,7 +26,11 @@ Append query to the base route. Query can be composed of:
 ```
 * (optional) Conditions - put conditions into curly brackets. Available operators: <, >, =, <=, >=, !=, AND, OR
 ```sh
-{column1 > 500 AND column2 < 800 OR (column3 = "JohnDoe" AND column4 <= 20)}
+{column1 > 500 AND column2 < 800 OR (column3 = <str>JohnDoe</str> AND column4 <= 20)}
+```
+* String Values must be wrapped inside <str></str> block
+```sh
+{name = <str>Jack</str> AND description LIKE <str>%it started as "game"%</str>}
 ```
 * (optional) Limit - for limit 5 rows simply append
 ```sh
