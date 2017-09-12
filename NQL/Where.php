@@ -28,7 +28,7 @@ class Where
      * @var string
      */
     private static $regKeyStringValue =
-        '/^<str>(?<value>[^\.)]+)<\/str>$/';
+        '/^<str>(?<value>.+)<\/str>$/';
 
     /**
      * @var WherePart[]
