@@ -298,4 +298,18 @@ class ProductTest extends WebTestCase
         );
     }
 
+    public function testStrWrappingNotation(){
+        $repository = $this
+            ->get('doctrine.orm.default_entity_manager')
+            ->getRepository('Search:Product');
+
+        $products = $repository
+            ->findBy(['name' => 'Sample product with "quoted" word in name']);
+
+        $this->assertEquals(
+            $this->toJson($products),
+            $this->table('product', '{name=<str>Sample product with \"quoted\" word in name</str>}')
+        );
+    }
+
 }
