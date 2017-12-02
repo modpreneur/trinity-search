@@ -111,6 +111,14 @@ class Column
         $this->name = $name;
     }
 
+    /**
+     * @param null $wrappingFunction
+     */
+    public function setWrappingFunction($wrappingFunction)
+    {
+        $this->wrappingFunction = $wrappingFunction;
+    }
+
 
     /**
      * @return string

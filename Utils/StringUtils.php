@@ -62,7 +62,7 @@ final class StringUtils
     public static function startsWith(?string $str, ?string $prefix) : bool
     {
         return ((null === $str) && (null === $prefix))
-            ?: (bool)(self::substring($str, 0, self::length($prefix)) === $prefix)
+            ?: (self::substring($str, 0, self::length($prefix)) === $prefix)
         ;
     }
 
@@ -75,7 +75,7 @@ final class StringUtils
     public static function endsWith(?string $str, ?string $suffix) : bool
     {
         return ((null === $str) && (null === $suffix))
-            ?: (bool)(self::substring($str, self::length($str) - self::length($suffix)) === $suffix)
+            ?: (self::substring($str, self::length($str) - self::length($suffix)) === $suffix)
         ;
     }
 

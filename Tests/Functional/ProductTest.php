@@ -147,13 +147,13 @@ class ProductTest extends WebTestCase
 
         $p = [];
 
-        $p[] = $products[8];
         $p[] = $products[9];
+        $p[] = $products[10];
 
 
         $this->assertEquals(
             $this->toJson($p),
-            $this->table('product', '{id>8}')
+            $this->table('product', '{id>9}')
         );
     }
 
@@ -266,6 +266,7 @@ class ProductTest extends WebTestCase
 
         $p = [];
 
+        $p[] = $products[10];
         $p[] = $products[9];
         $p[] = $products[8];
         $p[] = $products[7];
@@ -280,6 +281,34 @@ class ProductTest extends WebTestCase
         $this->assertEquals(
             $this->toJson($p),
             $this->table('product', 'ORDERBY id DESC')
+        );
+    }
+
+    public function testProductContainingQuotesInName(){
+        $repository = $this
+            ->get('doctrine.orm.default_entity_manager')
+            ->getRepository('Search:Product');
+
+        $products = $repository
+            ->findBy(['name' => 'Sample product with "quoted" word in name']);
+
+        $this->assertEquals(
+            $this->toJson($products),
+            $this->table('product', '{name="Sample product with \"quoted\" word in name"}')
+        );
+    }
+
+    public function testStrWrappingNotation(){
+        $repository = $this
+            ->get('doctrine.orm.default_entity_manager')
+            ->getRepository('Search:Product');
+
+        $products = $repository
+            ->findBy(['name' => 'Sample product with "quoted" word in name']);
+
+        $this->assertEquals(
+            $this->toJson($products),
+            $this->table('product', '{name=<str>Sample product with \"quoted\" word in name</str>}')
         );
     }
 

@@ -19,8 +19,16 @@ class Where
      * @var string
      */
     private static $regKeyOpValue =
-        '/^(?<key>[^\s<>=!]+)\s*(?<operator>(([<>!]?=|[<>]))|(LIKE))\s*(?<value>\"[^\.")]+\"|[^\s)]+)/'
+//        '/^(?<key>[^\s<>=!]+)\s*(?<operator>(([<>!]?=|[<>]))|(LIKE))\s*(?<value>\"[^\.")]+\"|[^\s)]+)/'
+        '/^(?<key>[^\s<>=!]+)\s*(?<operator>(?:(?:[<>!]?=|[<>]))|(LIKE))\s*(?<value><str>[^\.)]+<\/str>|\"[^\.)]+\"|[^\s)]+)/'
     ;
+
+    /**
+     * Regular expression to get just value
+     * @var string
+     */
+    private static $regKeyStringValue =
+        '/^<str>(?<value>.+)<\/str>$/';
 
     /**
      * @var WherePart[]
@@ -128,7 +136,16 @@ class Where
                         $part->type = WherePartType::CONDITION;
                         $part->key = Column::parse($match['key']);
                         $value = $match['value'];
-                        if (StringUtils::startsWith($value, '"') && StringUtils::endsWith($value, '"')) {
+                        if (StringUtils::startsWith($value, '<str>') && StringUtils::endsWith($value, '</str>')) {
+//                            $value = StringUtils::substring($value, 1, StringUtils::length($value) - 1);
+                            $matchValue = [];
+                            $found = preg_match(self::$regKeyStringValue, $value, $matchValue);
+                            if ($found) {
+                                $value = $matchValue['value'];
+                            }
+                        } elseif (StringUtils::startsWith($value, '"') &&
+                            StringUtils::endsWith($value, '"')
+                        ) {
                             $value = StringUtils::substring($value, 1, StringUtils::length($value) - 1);
                         }
                         $part->value = $value;
