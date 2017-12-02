@@ -4,6 +4,6 @@ composer update
 
 phpunit
 
-phpstan analyse Controller/ DataFixtures/ DependencyInjection/ Exception/ NQL/ Serialization/ Tests/ Utils/ --level=4
+phpstan analyse Controller/ DataFixtures/ DependencyInjection/ Exception/ NQL/ Serialization/ Utils/ --level=4
 
-#tail -f /dev/null
+tail -f /dev/null
